@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loot Roller</title>
+  <script src="roller.js"></script>
+</head>
+<body>
+  <h2>Loot Roller</h2>
+
+  <!-- Login Form -->
+  <div id="login">
+    <h3>Login</h3>
+    <label>Email: <input type="text" id="email"></label><br>
+    <label>Code: <input type="password" id="code"></label><br>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Roller Interface -->
+  <div id="roller" style="display:none;">
+    <h3>Select Modifiers</h3>
+    <div id="modifiers"></div>
+    <button onclick="rollItems()">Roll Items</button>
+
+    <div id="result"></div>
+
+    <h3>History</h3>
+    <ul id="history"></ul>
+  </div>
+
+  <script>
+    const SHEET_URL = "YOUR_WEB_APP_URL_HERE"; // Replace with your Google Apps Script Web App URL
+    let currentUser = null;
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const code = document.getElementById("code").value;
+
+      if (USERS[email] && USERS[email] === code) {
+        currentUser = email;
+        document.getElementById("login").style.display = "none";
+        document.getElementById("roller").style.display = "block";
+        loadModifiers();
+      } else {
+        alert("Invalid login");
+      }
+    }
+
+    function loadModifiers() {
+      const div = document.getElementById("modifiers");
+      div.innerHTML = "";
+      for (const [mod, val] of Object.entries(MODIFIERS)) {
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = mod;
+        div.appendChild(cb);
+        div.appendChild(document.createTextNode(` ${mod} (+${val*100}%)`));
+        div.appendChild(document.createElement("br"));
+      }
+    }
+
+    function rollItems() {
+      const selected = [...document.querySelectorAll("#modifiers input:checked")].map(cb => cb.value);
+      const results = doRoll(selected);
+
+      const now = new Date().toLocaleString();
+
+      // Display results
+      document.getElementById("result").innerHTML = `
+        <p><b>Email:</b> ${currentUser}</p>
+        <p><b>Items:</b> ${results.join(", ")}</p>
+        <p><b>Time:</b> ${now}</p>
+      `;
+
+      // Add to page history
+      const li = document.createElement("li");
+      li.textContent = `${now} - ${currentUser} rolled: ${results.join(", ")}`;
+      document.getElementById("history").prepend(li);
+
+      // Send to Google Sheets
+      fetch(SHEET_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          email: currentUser,
+          item: results.join(", "),
+          time: now
+        })
+      }).catch(err => console.error(err));
+    }
+  </script>
+</body>
+</html>

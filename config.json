@@ -1,0 +1,17 @@
+{
+  "items": [
+    { "name": "Moonstone Dagger", "base": 0.05 },
+    { "name": "Golden Amulet", "base": 0.10 },
+    { "name": "Healing Herb", "base": 0.20 },
+    { "name": "Rusty Sword", "base": 0.30 }
+  ],
+  "modifiers": {
+    "lucky_trait": 0.10,
+    "pet_companion": 0.05,
+    "magic_ring": 0.15
+  },
+  "users": {
+    "player@example.com": "1234",
+    "test@example.com": "abcd"
+  }
+}
