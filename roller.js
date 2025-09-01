@@ -1,13 +1,19 @@
-// Paste the Web App URL from Apps Script here
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxRuQ07ChU3hjaOGxM3vJIerOtEWFHlRS3IDdLFsUkRBGyQY4jSYVXJqWW49aPX11w/exec";
-
 let currentUser = null;
+let USERS = {};
+let ITEMS = [];
+let MODIFIERS = [];
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzzXyj2qWEmRT7kUJS-fKnb5-LyH5qze3H6biqKdmsODDmAdo28Xle93ZSJcWsy4NGm/exec";
 
-// Example user list (or loaded from config.json)
-const USERS = {
-  "player@example.com": "1234",
-  "test@example.com": "abcd"
-};
+// Load the config.json file
+fetch("config.json")
+  .then(response => response.json())
+  .then(data => {
+    USERS = data.users;       // { "player@example.com": "1234", ... }
+    ITEMS = data.items;       // ["Sword", "Shield", "Potion", ...]
+    MODIFIERS = data.modifiers; // [0, 0.1, 0.2, ...]
+    console.log("Config loaded:", data);
+  })
+  .catch(err => console.error("Error loading config.json:", err));
 
 function login() {
   const email = document.getElementById("email").value;
@@ -27,18 +33,12 @@ function rollItems() {
   if (!currentUser) return;
 
   const modifier = parseFloat(document.getElementById("modifier").value);
-  
-  // Example items & base chance
-  const ITEMS = ["Sword", "Shield", "Potion", "Bow"];
   const BASE_CHANCE = 0.5;
 
-  // Roll logic
   const results = ITEMS.filter(() => Math.random() < BASE_CHANCE + modifier);
 
-  // Show results
   document.getElementById("results").textContent = results.join(", ") || "No items";
 
-  // Log to Google Sheet
   const now = new Date().toLocaleString();
   fetch(SHEET_URL, {
     method: "POST",
