@@ -1,0 +1,51 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f4f4f4;
+}
+
+h2, h3, h4 {
+  color: #333;
+}
+
+#login-section, #roller-section {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+#roll-results {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #e7f3fe;
+  border-left: 4px solid #2196F3;
+}

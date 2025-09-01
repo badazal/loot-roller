@@ -1,54 +1,94 @@
+// ----------------------------
+// IMPORT DATA FILES
+// ----------------------------
+import { users } from "./data/users.js";
+import { companions } from "./data/companions.js";
+import { equipment } from "./data/equipment.js";
+import { traits } from "./data/traits.js";
+import { consumables } from "./data/consumables.js";
+
+// ----------------------------
+// GLOBALS
+// ----------------------------
 let currentUser = null;
-let USERS = {};
-let ITEMS = [];
-let MODIFIERS = [];
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzzXyj2qWEmRT7kUJS-fKnb5-LyH5qze3H6biqKdmsODDmAdo28Xle93ZSJcWsy4NGm/exec";
+const activities = ["Fishing", "Hunting", "Exploring", "Caving"];
 
-// Load the config.json file
-fetch("config.json")
-  .then(response => response.json())
-  .then(data => {
-    USERS = data.users;       // { "player@example.com": "1234", ... }
-    ITEMS = data.items;       // ["Sword", "Shield", "Potion", ...]
-    MODIFIERS = data.modifiers; // [0, 0.1, 0.2, ...]
-    console.log("Config loaded:", data);
-  })
-  .catch(err => console.error("Error loading config.json:", err));
-
-function login() {
+// ----------------------------
+// LOGIN LOGIC
+// ----------------------------
+document.getElementById("login-button").addEventListener("click", () => {
   const email = document.getElementById("email").value;
-  const code = document.getElementById("code").value;
+  const passcode = document.getElementById("passcode").value;
 
-  if (USERS[email] && USERS[email] === code) {
-    currentUser = email;
-    document.getElementById("login").style.display = "none";
-    document.getElementById("roller").style.display = "block";
-    document.getElementById("userName").textContent = email;
+  const user = users.find(u => u.email === email && u.passcode === passcode);
+  if (user) {
+    currentUser = user;
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("roller-section").style.display = "block";
+    initActivitySelection();
   } else {
-    alert("Invalid login");
+    document.getElementById("login-error").innerText = "Invalid login.";
   }
+});
+
+// ----------------------------
+// ACTIVITY SELECTION
+// ----------------------------
+function initActivitySelection() {
+  const container = document.getElementById("activity-selection");
+  container.innerHTML = "";
+
+  activities.forEach(act => {
+    const label = document.createElement("label");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "activity";
+    radio.value = act;
+    radio.addEventListener("change", () => loadActivityOptions(act));
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(act));
+    container.appendChild(label);
+    container.appendChild(document.createElement("br"));
+  });
 }
 
-function rollItems() {
-  if (!currentUser) return;
+// ----------------------------
+// FILTER OPTIONS BY ACTIVITY
+// ----------------------------
+function loadActivityOptions(activity) {
+  const filteredCompanions = companions.filter(c => c.activities.includes(activity) || c.activities.includes("all"));
+  const filteredEquipment = equipment.filter(e => e.activities.includes(activity) || e.activities.includes("all"));
+  const filteredTraits = traits.filter(t => t.activities.includes(activity) || t.activities.includes("all"));
+  const filteredConsumables = consumables.filter(c => c.activities.includes(activity) || c.activities.includes("all"));
 
-  const modifier = parseFloat(document.getElementById("modifier").value);
-  const BASE_CHANCE = 0.5;
-
-  const results = ITEMS.filter(() => Math.random() < BASE_CHANCE + modifier);
-
-  document.getElementById("results").textContent = results.join(", ") || "No items";
-
-  const now = new Date().toLocaleString();
-  fetch(SHEET_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      email: currentUser,
-      item: results.join(", "),
-      time: now
-    })
-  })
-  .then(r => r.json())
-  .then(data => console.log("Sheet response:", data))
-  .catch(err => console.error("Error sending to sheet:", err));
+  populateCheckboxes("companions-checkboxes", filteredCompanions);
+  populateCheckboxes("equipment-checkboxes", filteredEquipment);
+  populateCheckboxes("traits-checkboxes", filteredTraits);
+  populateCheckboxes("consumables-checkboxes", filteredConsumables);
 }
+
+// ----------------------------
+// POPULATE CHECKBOXES
+// ----------------------------
+function populateCheckboxes(containerId, items) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = container.querySelector("h4").outerHTML; // keep header
+  items.forEach(item => {
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = item.name;
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(` ${item.name} - ${item.perk}`));
+    container.appendChild(label);
+    container.appendChild(document.createElement("br"));
+  });
+}
+
+// ----------------------------
+// ROLL BUTTON (placeholder)
+// ----------------------------
+document.getElementById("roll-button").addEventListener("click", () => {
+  const rollResults = document.getElementById("roll-results");
+  rollResults.innerHTML = `<p>Rolling logic not implemented yet!</p>`;
+});

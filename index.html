@@ -3,39 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>Loot Roller</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #roller { display: none; margin-top: 20px; }
-    input, select, button { margin: 5px 0; padding: 5px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Loot Roller</h1>
-
-  <!-- Login form -->
-  <div id="login">
-    <label>Email: <input type="text" id="email"></label><br>
-    <label>Code: <input type="password" id="code"></label><br>
-    <button onclick="login()">Login</button>
+  <!-- LOGIN SECTION -->
+  <div id="login-section">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="passcode" placeholder="Passcode"><br>
+    <button id="login-button">Login</button>
+    <p id="login-error" style="color:red;"></p>
   </div>
 
-  <!-- Roller UI -->
-  <div id="roller">
-    <h2>Welcome, <span id="userName"></span>!</h2>
-    
-    <label>Select Modifiers:</label>
-    <select id="modifier">
-      <option value="0">None</option>
-      <option value="0.1">Bonus 10%</option>
-      <option value="0.2">Bonus 20%</option>
-    </select><br>
+  <!-- ROLLER SECTION -->
+  <div id="roller-section" style="display:none;">
+    <h2>Which activity do you want to roll?</h2>
+    <div id="activity-selection"></div>
 
-    <button onclick="rollItems()">Roll Items</button>
+    <h3>Select the companions, equipment, traits, and consumables being used:</h3>
+    <div id="options-container">
+      <div id="companions-checkboxes"><h4>Companions</h4></div>
+      <div id="equipment-checkboxes"><h4>Equipment</h4></div>
+      <div id="traits-checkboxes"><h4>Traits</h4></div>
+      <div id="consumables-checkboxes"><h4>Consumables</h4></div>
+    </div>
 
-    <h3>Roll Results:</h3>
-    <div id="results"></div>
+    <button id="roll-button">Roll!</button>
+    <div id="roll-results"></div>
   </div>
 
-  <script src="roller.js"></script>
+  <script type="module" src="roller.js"></script>
 </body>
 </html>
