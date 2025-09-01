@@ -1,30 +1,54 @@
-let ITEMS = [];
-let MODIFIERS = {};
-let USERS = {};
+// Paste the Web App URL from Apps Script here
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxRuQ07ChU3hjaOGxM3vJIerOtEWFHlRS3IDdLFsUkRBGyQY4jSYVXJqWW49aPX11w/exec";
 
-// Load config.json when the page loads
-fetch("config.json")
-  .then(response => response.json())
-  .then(data => {
-    ITEMS = data.items;
-    MODIFIERS = data.modifiers;
-    USERS = data.users;
-  })
-  .catch(err => console.error("Error loading config:", err));
+let currentUser = null;
 
-// Function to roll items
-function doRoll(selectedModifiers) {
-  // Calculate total boost
-  let boost = selectedModifiers.reduce((sum, mod) => sum + (MODIFIERS[mod] || 0), 0);
+// Example user list (or loaded from config.json)
+const USERS = {
+  "player@example.com": "1234",
+  "test@example.com": "abcd"
+};
 
-  // Roll each item independently
-  let results = [];
-  for (const it of ITEMS) {
-    if (Math.random() < it.base + boost) {
-      results.push(it.name);
-    }
+function login() {
+  const email = document.getElementById("email").value;
+  const code = document.getElementById("code").value;
+
+  if (USERS[email] && USERS[email] === code) {
+    currentUser = email;
+    document.getElementById("login").style.display = "none";
+    document.getElementById("roller").style.display = "block";
+    document.getElementById("userName").textContent = email;
+  } else {
+    alert("Invalid login");
   }
+}
 
-  if (results.length === 0) results.push("Nothing");
-  return results;
+function rollItems() {
+  if (!currentUser) return;
+
+  const modifier = parseFloat(document.getElementById("modifier").value);
+  
+  // Example items & base chance
+  const ITEMS = ["Sword", "Shield", "Potion", "Bow"];
+  const BASE_CHANCE = 0.5;
+
+  // Roll logic
+  const results = ITEMS.filter(() => Math.random() < BASE_CHANCE + modifier);
+
+  // Show results
+  document.getElementById("results").textContent = results.join(", ") || "No items";
+
+  // Log to Google Sheet
+  const now = new Date().toLocaleString();
+  fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      email: currentUser,
+      item: results.join(", "),
+      time: now
+    })
+  })
+  .then(r => r.json())
+  .then(data => console.log("Sheet response:", data))
+  .catch(err => console.error("Error sending to sheet:", err));
 }
