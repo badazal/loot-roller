@@ -50,14 +50,14 @@ label {
   border-left: 4px solid #2196F3;
 }
 
-/* --- NEW: Make checkboxes display in 3 columns --- */
+/* --- FIX: Make checkboxes line up in 3 neat columns --- */
 #companions-checkboxes,
 #equipment-checkboxes,
 #traits-checkboxes,
 #consumables-checkboxes {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  gap: 6px 12px; /* space between rows and columns */
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 equal columns */
+  gap: 8px 16px; /* row and column spacing */
   margin-bottom: 20px;
 }
 
@@ -67,4 +67,5 @@ label {
 #consumables-checkboxes label {
   display: flex;
   align-items: center;
+  white-space: nowrap; /* prevents checkbox text from wrapping to the next line */
 }

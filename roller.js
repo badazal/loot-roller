@@ -11,7 +11,7 @@ import { consumables } from "./data/consumables.js";
 // GLOBALS
 // ----------------------------
 let currentUser = null;
-const activities = ["Fishing", "Hunting", "Exploring", "Foraging", "Caving","Crusades","Conquests"];
+const activities = ["Fishing", "Hunting", "Expeditions", "Foraging", "Caving","Crusades","Conquests"];
 
 // ----------------------------
 // LOGIN LOGIC
