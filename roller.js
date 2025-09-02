@@ -79,7 +79,7 @@ function populateCheckboxes(containerId, items) {
     checkbox.type = "checkbox";
     checkbox.value = item.name;
     label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(` ${item.name} - ${item.perk}`));
+    label.appendChild(document.createTextNode(` ${item.name} `));
     container.appendChild(label);
     container.appendChild(document.createElement("br"));
   });

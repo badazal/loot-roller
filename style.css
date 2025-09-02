@@ -49,3 +49,22 @@ label {
   background-color: #e7f3fe;
   border-left: 4px solid #2196F3;
 }
+
+/* --- NEW: Make checkboxes display in 3 columns --- */
+#companions-checkboxes,
+#equipment-checkboxes,
+#traits-checkboxes,
+#consumables-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 6px 12px; /* space between rows and columns */
+  margin-bottom: 20px;
+}
+
+#companions-checkboxes label,
+#equipment-checkboxes label,
+#traits-checkboxes label,
+#consumables-checkboxes label {
+  display: flex;
+  align-items: center;
+}
