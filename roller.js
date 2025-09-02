@@ -72,18 +72,51 @@ function loadActivityOptions(activity) {
 // ----------------------------
 function populateCheckboxes(containerId, items) {
   const container = document.getElementById(containerId);
-  container.innerHTML = container.querySelector("h4").outerHTML; // keep header
-  items.forEach(item => {
-    const label = document.createElement("label");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = item.name;
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(` ${item.name} `));
-    container.appendChild(label);
-    container.appendChild(document.createElement("br"));
+  const header = container.querySelector("h4");
+  container.innerHTML = "";
+  if (header) container.appendChild(header);
+
+  // Wrapper for three columns
+  const wrap = document.createElement("div");
+  wrap.className = "options-three-col";
+
+  const col1 = document.createElement("div");
+  const col2 = document.createElement("div");
+  const col3 = document.createElement("div");
+  col1.className = col2.className = col3.className = "options-col";
+
+  // Compute balanced sizes so columns are as even as possible.
+  const n = items.length;
+  const size1 = Math.ceil(n / 3);
+  const remaining = n - size1;
+  const size2 = Math.ceil(remaining / 2);
+  const size3 = n - size1 - size2; // last column gets the rest (same or one fewer)
+
+  const chunks = [
+    items.slice(0, size1),
+    items.slice(size1, size1 + size2),
+    items.slice(size1 + size2)
+  ];
+  const cols = [col1, col2, col3];
+
+  chunks.forEach((chunk, i) => {
+    chunk.forEach(item => {
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = item.name;
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(` ${item.name} `));
+      cols[i].appendChild(label);
+    });
   });
+
+  wrap.appendChild(col1);
+  wrap.appendChild(col2);
+  wrap.appendChild(col3);
+  container.appendChild(wrap);
 }
+
 
 // ----------------------------
 // ROLL BUTTON (placeholder)
