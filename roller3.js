@@ -156,40 +156,35 @@ document.getElementById("roll-button").addEventListener("click", () => {
   ];
 
   // ----------------------
-  // 2. Special Traits
+  // 2. Handle Lavinia's Luck first
   // ----------------------
-  const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
   let companionBonus = 0;
-  if (lavinia && rollChance(lavinia.chance)) {
-    lavinia.status = "on";
+  const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
+  if (lavinia) {
+    lavinia.status = "on"; // always on if selected
     companionBonus = lavinia.perks?.companionBonus || 0;
   }
 
-  const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
-
   // ----------------------
-  // 3. Roll all entities
+  // 3. Roll everything else
   // ----------------------
   allEntities.forEach(e => {
-    if (e.status === "off") {
-      let chance = e.chance || 0;
-
-      if (e.category === "companion" && companionBonus > 0) {
-        chance += companionBonus;
-        e.note = "(Lavinia's Luck applied)";
-      }
-
-      e.status = rollChance(chance) ? "on" : "off";
+    let chance = e.chance || 0;
+    if (e.category === "companion" && companionBonus > 0) {
+      chance += companionBonus;
+      e.note = "(Lavinia's Luck bonus applied)";
     }
+    e.status = rollChance(chance) ? "on" : "off";
   });
 
   // ----------------------
-  // 4. Apply Twist of Fate
+  // 4. Twist of Fate rerolls
   // ----------------------
+  const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
   if (twistOfFate && twistOfFate.status === "on") {
     allEntities.forEach(e => {
       if (e.category === "trait" && e.status === "off") {
-        const reroll = rollChance(e.chance);
+        const reroll = rollChance(e.chance || 0);
         if (reroll) {
           e.status = "on";
           e.note = "(Twist of Fate reroll → On)";
