@@ -1,34 +1,163 @@
 // ----------------------------
 // IMPORT DATA FILES
 // ----------------------------
+import { users } from "./data/users.js";
 import { companions } from "./data/companions.js";
 import { equipment } from "./data/equipment.js";
 import { traits } from "./data/traits.js";
 import { consumables } from "./data/consumables.js";
 
 // ----------------------------
-// UTILITY
+// GLOBALS
 // ----------------------------
-function rollChance(chance = 0) {
-  return Math.random() < chance;
+let currentUser = null;
+const activities = ["Fishing", "Hunting", "Expeditions", "Foraging", "Caving", "Crusades", "Conquests"];
+
+// ----------------------------
+// LOGIN LOGIC
+// ----------------------------
+document.getElementById("login-button").addEventListener("click", () => {
+  const email = document.getElementById("email").value;
+  const passcode = document.getElementById("passcode").value;
+
+  const user = users.find(u => u.email === email && u.passcode === passcode);
+  if (user) {
+    currentUser = user;
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("roller-section").style.display = "block";
+    initActivitySelection();
+  } else {
+    document.getElementById("login-error").innerText = "Invalid login.";
+  }
+});
+
+// ----------------------------
+// ACTIVITY SELECTION
+// ----------------------------
+function initActivitySelection() {
+  const container = document.getElementById("activity-selection");
+  container.innerHTML = "";
+
+  activities.forEach(act => {
+    const label = document.createElement("label");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "activity";
+    radio.value = act;
+    radio.addEventListener("change", () => loadActivityOptions(act));
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(act));
+    container.appendChild(label);
+    container.appendChild(document.createElement("br"));
+  });
 }
 
 // ----------------------------
-// GET SELECTED CHECKBOX ITEMS
+// FILTER OPTIONS BY ACTIVITY
 // ----------------------------
-function getSelectedCheckboxes(containerId, allItems) {
-  const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]`);
-  const selectedNames = Array.from(checkboxes)
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
-  return allItems.filter(item => selectedNames.includes(item.name));
+function loadActivityOptions(activity) {
+  const filteredCompanions = companions.filter(c => c.activities.includes(activity) || c.activities.includes("all"));
+  const filteredEquipment = equipment.filter(e => e.activities.includes(activity) || e.activities.includes("all"));
+  const filteredTraits = traits.filter(t => t.activities.includes(activity) || t.activities.includes("all"));
+  const filteredConsumables = consumables.filter(c => c.activities.includes(activity) || c.activities.includes("all"));
+
+  populateCheckboxes("companions-checkboxes", filteredCompanions);
+  populateCheckboxes("equipment-checkboxes", filteredEquipment);
+  populateCheckboxes("traits-checkboxes", filteredTraits);
+  populateCheckboxes("consumables-checkboxes", filteredConsumables);
 }
 
 // ----------------------------
-// ROLL ENTITIES
+// POPULATE CHECKBOXES
 // ----------------------------
-function rollEntities(allEntities, selectedCompanions) {
-  // Step 1: Check for Lavinia's Luck
+function populateCheckboxes(containerId, items) {
+  const container = document.getElementById(containerId);
+  const header = container.querySelector("h4");
+  container.innerHTML = "";
+  if (header) container.appendChild(header);
+
+  const wrap = document.createElement("div");
+  wrap.className = "options-three-col";
+
+  const col1 = document.createElement("div");
+  const col2 = document.createElement("div");
+  const col3 = document.createElement("div");
+  col1.className = col2.className = col3.className = "options-col";
+
+  const n = items.length;
+  const size1 = Math.ceil(n / 3);
+  const remaining = n - size1;
+  const size2 = Math.ceil(remaining / 2);
+
+  const chunks = [
+    items.slice(0, size1),
+    items.slice(size1, size1 + size2),
+    items.slice(size1 + size2)
+  ];
+  const cols = [col1, col2, col3];
+
+  chunks.forEach((chunk, i) => {
+    chunk.forEach(item => {
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = item.name;
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(` ${item.name} `));
+      cols[i].appendChild(label);
+    });
+  });
+
+  wrap.appendChild(col1);
+  wrap.appendChild(col2);
+  wrap.appendChild(col3);
+  container.appendChild(wrap);
+}
+
+// ----------------------------
+// HELPER: roll chance
+// ----------------------------
+function rollChance(percent) {
+  return Math.random() * 100 < percent;
+}
+
+// ----------------------------
+// ROLL BUTTON
+// ----------------------------
+document.getElementById("roll-button").addEventListener("click", () => {
+  const activity = document.querySelector("input[name='activity']:checked")?.value;
+  if (!activity) {
+    alert("Please select an activity first.");
+    return;
+  }
+
+  // Collect selected checkboxes
+  const selectedCompanions = companions.filter(c =>
+    document.querySelector(`#companions-checkboxes input[value="${c.name}"]`)?.checked
+  );
+  const selectedEquipment = equipment.filter(e =>
+    document.querySelector(`#equipment-checkboxes input[value="${e.name}"]`)?.checked
+  );
+  const selectedTraits = traits.filter(t =>
+    document.querySelector(`#traits-checkboxes input[value="${t.name}"]`)?.checked
+  );
+  const selectedConsumables = consumables.filter(c =>
+    document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
+  );
+
+  // ----------------------
+  // 1. Build master list with category
+  // ----------------------
+  const allEntities = [
+    ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off" })),
+    ...selectedEquipment.map(e => ({ ...e, category: "equipment", status: "off" })),
+    ...selectedTraits.map(t => ({ ...t, category: "trait", status: "off" })),
+    ...selectedConsumables.map(c => ({ ...c, category: "consumable", status: "off" }))
+  ];
+
+  // ----------------------
+  // 2. Special Traits
+  // ----------------------
   const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
   let companionBonus = 0;
   if (lavinia && rollChance(lavinia.chance)) {
@@ -38,75 +167,45 @@ function rollEntities(allEntities, selectedCompanions) {
 
   const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
 
-  // Step 2: Roll all entities
+  // ----------------------
+  // 3. Roll all entities
+  // ----------------------
   allEntities.forEach(e => {
-    e.affectedBy = [];
-
     if (e.status === "off") {
       let chance = e.chance || 0;
 
-      // Apply Lavinia's Luck bonus if selected companion
-      if (selectedCompanions.includes(e) && companionBonus > 0) {
+      if (e.category === "companion" && companionBonus > 0) {
         chance += companionBonus;
-        e.affectedBy.push("Lavinia's Luck");
+        e.note = "(Lavinia's Luck applied)";
       }
 
       e.status = rollChance(chance) ? "on" : "off";
     }
   });
 
-  // Step 3: Apply Twist of Fate to traits
+  // ----------------------
+  // 4. Apply Twist of Fate
+  // ----------------------
   if (twistOfFate && twistOfFate.status === "on") {
     allEntities.forEach(e => {
-      if (traits.includes(e) && e.status === "off") {
-        const original = e.status;
-        e.status = rollChance(e.chance) ? "on" : "off";
-        if (original === "off" && e.status === "on") {
-          e.affectedBy.push("Twist of Fate");
+      if (e.category === "trait" && e.status === "off") {
+        const reroll = rollChance(e.chance);
+        if (reroll) {
+          e.status = "on";
+          e.note = "(Twist of Fate reroll → On)";
+        } else {
+          e.note = "(Twist of Fate reroll → still Off)";
         }
       }
     });
   }
 
-  return allEntities;
-}
-
-// ----------------------------
-// DISPLAY RESULTS
-// ----------------------------
-function displayResults(allEntities) {
-  const container = document.getElementById("roll-results");
-  container.innerHTML = "";
-
+  // ----------------------
+  // 5. Display results
+  // ----------------------
+  const rollResults = document.getElementById("roll-results");
+  rollResults.innerHTML = `<h3>Results for ${activity}</h3>`;
   allEntities.forEach(e => {
-    const div = document.createElement("div");
-    const affectedText = e.affectedBy.length ? ` (${e.affectedBy.join(", ")})` : "";
-    div.textContent = `${e.name}: ${e.status}${affectedText}`;
-    container.appendChild(div);
+    rollResults.innerHTML += `<p>${e.name}: ${e.status} ${e.note ? e.note : ""}</p>`;
   });
-}
-
-// ----------------------------
-// ROLL BUTTON
-// ----------------------------
-document.getElementById("roll-button").addEventListener("click", () => {
-  // Gather selected checkboxes
-  const selectedCompanions = getSelectedCheckboxes("companions-checkboxes", companions);
-  const selectedEquipment = getSelectedCheckboxes("equipment-checkboxes", equipment);
-  const selectedTraits = getSelectedCheckboxes("traits-checkboxes", traits);
-  const selectedConsumables = getSelectedCheckboxes("consumables-checkboxes", consumables);
-
-  // Build master list
-  const allEntities = [
-    ...selectedCompanions,
-    ...selectedEquipment,
-    ...selectedTraits,
-    ...selectedConsumables
-  ].map(e => ({ ...e, status: "off" }));
-
-  // Roll
-  const results = rollEntities(allEntities, selectedCompanions);
-
-  // Display
-  displayResults(results);
 });
