@@ -116,20 +116,21 @@ function populateCheckboxes(containerId, items) {
 }
 
 // ----------------------------
-// UTILITY: Roll Chance
+// HELPER: Roll chance
 // ----------------------------
 function rollChance(chance) {
   return Math.random() < chance;
 }
 
 // ----------------------------
-// ROLL BUTTON
+// ROLL BUTTON LOGIC
 // ----------------------------
 document.getElementById("roll-button").addEventListener("click", () => {
-  const selectedCompanions = getSelectedEntities("companions-checkboxes", companions);
-  const selectedEquipment = getSelectedEntities("equipment-checkboxes", equipment);
-  const selectedTraits = getSelectedEntities("traits-checkboxes", traits);
-  const selectedConsumables = getSelectedEntities("consumables-checkboxes", consumables);
+  // Build allEntities from selected checkboxes
+  const selectedCompanions = getSelectedItems("companions-checkboxes", companions);
+  const selectedEquipment = getSelectedItems("equipment-checkboxes", equipment);
+  const selectedTraits = getSelectedItems("traits-checkboxes", traits);
+  const selectedConsumables = getSelectedItems("consumables-checkboxes", consumables);
 
   const allEntities = [
     ...selectedCompanions,
@@ -142,22 +143,20 @@ document.getElementById("roll-button").addEventListener("click", () => {
 });
 
 // ----------------------------
-// GET SELECTED ENTITIES
+// GET SELECTED ITEMS FROM CHECKBOXES
 // ----------------------------
-function getSelectedEntities(containerId, sourceList) {
-  const checkboxes = document.querySelectorAll(`#${containerId} input[type=checkbox]`);
-  const selectedNames = Array.from(checkboxes)
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
-
-  return sourceList.filter(item => selectedNames.includes(item.name));
+function getSelectedItems(containerId, list) {
+  const container = document.getElementById(containerId);
+  const checkboxes = container.querySelectorAll("input[type=checkbox]");
+  const selectedNames = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+  return list.filter(item => selectedNames.includes(item.name));
 }
 
 // ----------------------------
-// ROLLER LOGIC
+// ROLL ENTITIES WITH LAVINIA AND TWIST OF FATE
 // ----------------------------
 function rollEntities(allEntities) {
-  // Check for Lavinia's Luck
+  // Lavinia's Luck
   const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
   let companionBonus = 0;
   if (lavinia && rollChance(lavinia.chance)) {
@@ -165,58 +164,42 @@ function rollEntities(allEntities) {
     companionBonus = lavinia.perks?.companionBonus || 0;
   }
 
-  // Check for Twist of Fate
+  // Twist of Fate
   const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
 
   // Roll all entities
   allEntities.forEach(e => {
-    if (e.status === "off") {
-      let chance = e.chance || 0;
+    let chance = e.chance || 0;
 
-      // Apply Lavinia's Luck bonus for companions
-      if (companions.includes(e)) chance += companionBonus;
+    if (selectedCompanions?.includes(e)) chance += companionBonus;
+    if (companions.includes(e) && companionBonus > 0) e.affectedBy.push("Lavinia's Luck");
 
-      const rolledOn = rollChance(chance);
-      e.status = rolledOn ? "on" : "off";
-    }
+    e.status = rollChance(chance) ? "on" : "off";
   });
 
-  // Apply Twist of Fate: reroll traits that were off
+  // Apply Twist of Fate
   if (twistOfFate && twistOfFate.status === "on") {
     allEntities.forEach(e => {
       if (traits.includes(e) && e.status === "off") {
         const rerolled = rollChance(e.chance);
         if (rerolled) {
           e.status = "on";
+          e.affectedBy.push("Twist of Fate (flipped to ON)");
+        } else {
           e.affectedBy.push("Twist of Fate");
         }
       }
     });
   }
 
-  // Mark Lavinia's Luck effects
-  if (companionBonus > 0) {
-    allEntities.forEach(e => {
-      if (companions.includes(e) && e.status === "on") {
-        e.affectedBy.push("Lavinia's Luck");
-      }
-    });
-  }
-
-  // ----------------------
-  // DISPLAY RESULTS
-  // ----------------------
+  // Display results
   const rollResults = document.getElementById("roll-results");
   rollResults.innerHTML = "";
   const ul = document.createElement("ul");
 
   allEntities.forEach(e => {
+    let effectText = e.affectedBy.length > 0 ? ` (${e.affectedBy.join(", ")})` : "";
     const li = document.createElement("li");
-    let effectText = "";
-    if (e.affectedBy.length > 0) {
-      const causedFlips = e.affectedBy.map(effect => `${effect} caused flip`);
-      effectText = ` (${causedFlips.join(", ")})`;
-    }
     li.textContent = `${e.name}: ${e.status}${effectText}`;
     ul.appendChild(li);
   });
