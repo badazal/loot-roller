@@ -149,12 +149,13 @@ document.getElementById("roll-button").addEventListener("click", () => {
   // ----------------------
   // 1. Build master list with category
   // ----------------------
-  const allEntities = [
-    ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off" })),
-    ...selectedEquipment.map(e => ({ ...e, category: "equipment", status: "off" })),
-    ...selectedTraits.map(t => ({ ...t, category: "trait", status: "off" })),
-    ...selectedConsumables.map(c => ({ ...c, category: "consumable", status: "off" }))
-  ];
+const allEntities = [
+  ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off", chance: c.chance })),
+  ...selectedEquipment.map(e => ({ ...e, category: "equipment", status: "off", chance: e.chance })),
+  ...selectedTraits.map(t => ({ ...t, category: "trait", status: "off", chance: t.chance })),
+  ...selectedConsumables.map(c => ({ ...c, category: "consumable", status: "off", chance: c.chance }))
+];
+
 
   // ----------------------
   // 2. Handle Lavinia's Luck first
