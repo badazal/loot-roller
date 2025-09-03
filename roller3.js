@@ -116,52 +116,48 @@ function populateCheckboxes(containerId, items) {
 }
 
 // ----------------------------
-// HELPER FUNCTIONS
+// UTILITY: Roll Chance
 // ----------------------------
 function rollChance(chance) {
-  return Math.random() <= chance;
-}
-
-function getSelectedCheckboxes(containerId, entityList) {
-  const container = document.getElementById(containerId);
-  const checkedBoxes = Array.from(container.querySelectorAll("input[type=checkbox]:checked"));
-  return entityList.filter(e => checkedBoxes.some(cb => cb.value === e.name));
+  return Math.random() < chance;
 }
 
 // ----------------------------
-// ROLL BUTTON LOGIC
+// ROLL BUTTON
 // ----------------------------
 document.getElementById("roll-button").addEventListener("click", () => {
-  const selectedActivity = document.querySelector('input[name="activity"]:checked')?.value;
-  if (!selectedActivity) {
-    alert("Please select an activity.");
-    return;
-  }
-  rollActivity(selectedActivity);
-});
-
-// ----------------------------
-// ROLLER LOGIC
-// ----------------------------
-function rollActivity(activity) {
-  // 1. Build master list from selected checkboxes
-  const selectedCompanions = getSelectedCheckboxes("companions-checkboxes", companions);
-  const selectedEquipment = getSelectedCheckboxes("equipment-checkboxes", equipment);
-  const selectedTraits = getSelectedCheckboxes("traits-checkboxes", traits);
-  const selectedConsumables = getSelectedCheckboxes("consumables-checkboxes", consumables);
+  const selectedCompanions = getSelectedEntities("companions-checkboxes", companions);
+  const selectedEquipment = getSelectedEntities("equipment-checkboxes", equipment);
+  const selectedTraits = getSelectedEntities("traits-checkboxes", traits);
+  const selectedConsumables = getSelectedEntities("consumables-checkboxes", consumables);
 
   const allEntities = [
     ...selectedCompanions,
     ...selectedEquipment,
     ...selectedTraits,
     ...selectedConsumables
-  ].map(e => ({
-    ...e,
-    status: "off",
-    affectedBy: [] // track perks affecting this entity
-  }));
+  ].map(e => ({ ...e, status: "off", affectedBy: [] }));
 
-  // 2. Lavinia's Luck check
+  rollEntities(allEntities);
+});
+
+// ----------------------------
+// GET SELECTED ENTITIES
+// ----------------------------
+function getSelectedEntities(containerId, sourceList) {
+  const checkboxes = document.querySelectorAll(`#${containerId} input[type=checkbox]`);
+  const selectedNames = Array.from(checkboxes)
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
+
+  return sourceList.filter(item => selectedNames.includes(item.name));
+}
+
+// ----------------------------
+// ROLLER LOGIC
+// ----------------------------
+function rollEntities(allEntities) {
+  // Check for Lavinia's Luck
   const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
   let companionBonus = 0;
   if (lavinia && rollChance(lavinia.chance)) {
@@ -169,29 +165,28 @@ function rollActivity(activity) {
     companionBonus = lavinia.perks?.companionBonus || 0;
   }
 
-  // 3. Twist of Fate check
+  // Check for Twist of Fate
   const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
 
-  // 4. Roll each entity
+  // Roll all entities
   allEntities.forEach(e => {
     if (e.status === "off") {
       let chance = e.chance || 0;
 
-      // Apply Lavinia's Luck bonus if this is a companion
-      if (selectedCompanions.includes(e) && companionBonus > 0) {
-        chance += companionBonus;
-        e.affectedBy.push("Lavinia's Luck");
-      }
+      // Apply Lavinia's Luck bonus for companions
+      if (companions.includes(e)) chance += companionBonus;
 
-      e.status = rollChance(chance) ? "on" : "off";
+      const rolledOn = rollChance(chance);
+      e.status = rolledOn ? "on" : "off";
     }
   });
 
-  // 5. Apply Twist of Fate rerolls for off traits
+  // Apply Twist of Fate: reroll traits that were off
   if (twistOfFate && twistOfFate.status === "on") {
     allEntities.forEach(e => {
-      if (selectedTraits.includes(e) && e.status === "off") {
-        if (rollChance(e.chance)) {
+      if (traits.includes(e) && e.status === "off") {
+        const rerolled = rollChance(e.chance);
+        if (rerolled) {
           e.status = "on";
           e.affectedBy.push("Twist of Fate");
         }
@@ -199,17 +194,32 @@ function rollActivity(activity) {
     });
   }
 
-  // 6. Display results
+  // Mark Lavinia's Luck effects
+  if (companionBonus > 0) {
+    allEntities.forEach(e => {
+      if (companions.includes(e) && e.status === "on") {
+        e.affectedBy.push("Lavinia's Luck");
+      }
+    });
+  }
+
+  // ----------------------
+  // DISPLAY RESULTS
+  // ----------------------
   const rollResults = document.getElementById("roll-results");
   rollResults.innerHTML = "";
   const ul = document.createElement("ul");
+
   allEntities.forEach(e => {
     const li = document.createElement("li");
-    const effectText = e.affectedBy.length > 0 ? ` (${e.affectedBy.join(", ")})` : "";
+    let effectText = "";
+    if (e.affectedBy.length > 0) {
+      const causedFlips = e.affectedBy.map(effect => `${effect} caused flip`);
+      effectText = ` (${causedFlips.join(", ")})`;
+    }
     li.textContent = `${e.name}: ${e.status}${effectText}`;
     ul.appendChild(li);
   });
-  rollResults.appendChild(ul);
 
-  return allEntities;
+  rollResults.appendChild(ul);
 }
