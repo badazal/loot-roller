@@ -117,9 +117,10 @@ function populateCheckboxes(containerId, items) {
 // ----------------------------
 // HELPER: roll chance
 // ----------------------------
-function rollChance(percent) {
-  return Math.random() * 100 < percent;
+function rollChance(chance) {
+  return Math.random() < chance; // chance should be 0–1
 }
+
 
 // ----------------------------
 // ROLL BUTTON
