@@ -119,7 +119,7 @@ function populateCheckboxes(containerId, items) {
 // ----------------------------
 function rollChance(chance) {
   return Math.random() < chance; // chance should be 0–1
-};
+}
 
 // ----------------------------
 // ROLL BUTTON
@@ -145,9 +145,8 @@ document.getElementById("roll-button").addEventListener("click", () => {
     document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
   );
 
-
   // ----------------------
-  // 1. Build master list with category
+  // 1. Build master list with category and store original chance
   // ----------------------
   const allEntities = [
     ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off", originalChance: c.chance, chance: c.chance })),
@@ -175,7 +174,7 @@ document.getElementById("roll-button").addEventListener("click", () => {
       finalChance += companionBonus;
       e.note = `(Lavinia's Luck bonus applied: ${e.chance.toFixed(2)} → ${finalChance.toFixed(2)})`;
     }
-    e.finalChance = finalChance; // store final odds for display
+    e.finalChance = finalChance;
     e.status = rollChance(finalChance) ? "on" : "off";
   });
 
