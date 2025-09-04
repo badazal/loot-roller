@@ -172,7 +172,7 @@ document.getElementById("roll-button").addEventListener("click", () => {
     let finalChance = e.chance || 0;
     if (e.category === "companion" && companionBonus > 0) {
       finalChance += companionBonus;
-      e.note = `(Lavinia's Luck applied: ${e.chance.toFixed(2)} → ${finalChance.toFixed(2)})`;
+      e.note = `(Lavinia's Luck applied)`;
     }
     e.finalChance = finalChance;
     e.status = rollChance(finalChance) ? "on" : "off";
