@@ -200,15 +200,19 @@ document.getElementById("roll-button").addEventListener("click", () => {
     });
   }
 
-  // ----------------------
-  // 5. Display results
-  // ----------------------
-  const rollResults = document.getElementById("roll-results");
-  rollResults.innerHTML = `<h3>Results for ${activity}</h3>`;
-  allEntities.forEach(e => {
-    const oddsDisplay = e.finalChance !== undefined
-      ? ` (Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
-      : "";
-  rollResults.innerHTML += `<p>${e.name} (Odds: ${e.finalChance.toFixed(2)}): ${e.status} ${e.note ? e.note : ""}</p>`;
-  });
+// ----------------------
+// 5. Display results
+// ----------------------
+const rollResults = document.getElementById("roll-results");
+rollResults.innerHTML = `<h3>Results for ${activity}</h3>`;
+allEntities.forEach(e => {
+  // Build odds display safely
+  const oddsDisplay = e.finalChance !== undefined
+    ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
+    : "(Odds: N/A)";
+
+  // Add line with name, odds, status, and any note
+  rollResults.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status} ${e.note ? e.note : ""}</p>`;
+});
+
 });
