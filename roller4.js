@@ -172,7 +172,7 @@ document.getElementById("roll-button").addEventListener("click", () => {
     let finalChance = e.chance || 0;
     if (e.category === "companion" && companionBonus > 0) {
       finalChance += companionBonus;
-      e.note = `(Lavinia's Luck bonus applied: ${e.chance.toFixed(2)} → ${finalChance.toFixed(2)})`;
+      e.note = `(Lavinia's Luck applied: ${e.chance.toFixed(2)} → ${finalChance.toFixed(2)})`;
     }
     e.finalChance = finalChance;
     e.status = rollChance(finalChance) ? "on" : "off";
@@ -209,6 +209,6 @@ document.getElementById("roll-button").addEventListener("click", () => {
     const oddsDisplay = e.finalChance !== undefined
       ? ` (Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
       : "";
-    rollResults.innerHTML += `<p>${e.name}: ${e.status} ${e.note ? e.note : ""}${oddsDisplay}</p>`;
+    rollResults.innerHTML += `<p>${e.name}${e.finalChance}: ${e.status} ${e.note ? e.note : ""}</p>`;
   });
 });
