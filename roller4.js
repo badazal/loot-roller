@@ -94,6 +94,7 @@ function populateCheckboxes(containerId, items) {
     items.slice(size1, size1 + size2),
     items.slice(size1 + size2)
   ];
+  const cols = [col1, col2, col3];
 
   chunks.forEach((chunk, i) => {
     chunk.forEach(item => {
@@ -118,7 +119,7 @@ function populateCheckboxes(containerId, items) {
 // ----------------------------
 function rollChance(chance) {
   return Math.random() < chance; // chance should be 0–1
-}
+};
 
 // ----------------------------
 // ROLL BUTTON
@@ -143,6 +144,7 @@ document.getElementById("roll-button").addEventListener("click", () => {
   const selectedConsumables = consumables.filter(c =>
     document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
   );
+
 
   // ----------------------
   // 1. Build master list with category
