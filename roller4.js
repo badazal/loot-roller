@@ -209,6 +209,6 @@ document.getElementById("roll-button").addEventListener("click", () => {
     const oddsDisplay = e.finalChance !== undefined
       ? ` (Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
       : "";
-    rollResults.innerHTML += `<p>${e.name}(${e.finalChance.toFixed(2)}): ${e.status} ${e.note ? e.note : ""}</p>`;
+  rollResults.innerHTML += `<p>${e.name} (Odds: ${e.finalChance.toFixed(2)}): ${e.status} ${e.note ? e.note : ""}</p>`;
   });
 });
