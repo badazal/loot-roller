@@ -217,7 +217,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   // 6. Base roll for activity items
   // ----------------------
   try {
-    const itemModule = await import(`./${activity}/items.js`);
+    const itemModule = await import(`./data/${activity}/items.js`);
 
     // For now, hardcoded values — in the future, perks.js will modify these
     const failureRate = 0.2; // 20% fail
