@@ -20,7 +20,7 @@ export const uncommonItems = [
 ];
 
 export const rareItems = [
-  { name: "Golden Coin", type: "valuable", rarity: "rare" },
+  { name: "Golden Coin", type: "junk", rarity: "rare" },
   { name: "Jeweled Dagger", type: "valuable", rarity: "rare" }
 ];
 
