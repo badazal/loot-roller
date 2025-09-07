@@ -263,5 +263,4 @@ try {
 } catch (err) {
   rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
 }
-
 });
