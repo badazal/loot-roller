@@ -1,8 +1,3 @@
-// ----------------------------
-// traits.js
-// Complete list of all traits for Nemeion Roller
-// ----------------------------
-
 export const traits = [
   // ----------------------------
   // Common Traits
@@ -12,7 +7,7 @@ export const traits = [
   {
     name: "Birthright",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { increaseTraitPassChance: 0.15 }
   },
 
@@ -20,7 +15,7 @@ export const traits = [
   {
     name: "Challenger",
     chance: 1.0,
-    activities: ["Competitions"],
+    activities: ["competitions"],
     perks: { returnAmount: "5-5" }
   },
 
@@ -29,7 +24,7 @@ export const traits = [
   {
     name: "Iron Will",
     chance: 0.05,
-    activities: ["Colosseum"],
+    activities: ["colosseum"],
     perks: { rerollAttempt: true }
   },
 
@@ -37,7 +32,7 @@ export const traits = [
   {
     name: "Silver Tongue",
     chance: 0.15,
-    activities: ["Conquests"],
+    activities: ["conquests"],
     perks: { duplicateBaseRoll: true }
   },
 
@@ -45,25 +40,25 @@ export const traits = [
   {
     name: "Heat Resistant",
     chance: 0.15,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "allTraitsList", number: 1 } }
   },
   {
     name: "Thick Coat",
     chance: 0.15,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "allTraitsList", number: 1 } }
   },
   {
     name: "Trader",
     chance: 0.15,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades", "Conquests"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades", "conquests"],
     perks: { addSpecialItems: { table: "traderList", number: 1 } }
   },
   {
     name: "Wild Nature",
     chance: 0.15,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "wildNatureList", number: 1 } }
   },
 
@@ -75,37 +70,37 @@ export const traits = [
   {
     name: "Big Boned",
     chance: 0.15,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { cubBuildChance: "Brute" }
   },
   {
     name: "Blessing of the Queen",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { cubGender: "Female" }
   },
   {
     name: "Blessing of the King",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { cubGender: "Male" }
   },
   {
     name: "Delicate",
     chance: 0.15,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { cubBuildChance: "Regal" }
   },
   {
     name: "Rare Blood",
     chance: 0.15,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { addSpecialItems: { table: "mutationsList", number: 1 } }
   },
   {
     name: "Fertility Treatment",
     chance: 0.15,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { extraCubs: "1-2" }
   },
 
@@ -113,7 +108,7 @@ export const traits = [
   {
     name: "Quick Feet",
     chance: 1.0,
-    activities: ["Competitions"],
+    activities: ["competitions"],
     perks: { returnAmount: "10-10" }
   },
 
@@ -123,13 +118,13 @@ export const traits = [
   {
     name: "Daywalker",
     chance: 0.15,
-    activities: ["Fishing","Hunting","Caving","Expeditions","Foraging","Crusades"],
+    activities: ["fishing","hunting","caving","expeditions","foraging","crusades"],
     perks: { rareOnly: true }
   },
   {
     name: "Nightbane",
     chance: 0.15,
-    activities: ["Fishing","Hunting","Caving","Expeditions","Foraging","Crusades"],
+    activities: ["fishing","hunting","caving","expeditions","foraging","crusades"],
     perks: { rareOnly: true }
   },
 
@@ -137,7 +132,7 @@ export const traits = [
   {
     name: "Lucky",
     chance: 0.15,
-    activities: ["Fishing","Hunting","Caving","Expeditions","Foraging","Crusades"],
+    activities: ["fishing","hunting","caving","expeditions","foraging","crusades"],
     perks: { extraItems: 1 }
   },
 
@@ -145,11 +140,9 @@ export const traits = [
   {
     name: "Primal Instincts",
     chance: 0.15,
-    activities: ["Beast Hunting"],
+    activities: ["beast hunting"],
     perks: { addSpecialItems: { table: "primalInstinctsList", number: 1 } }
   },
-
-
 
   // ----------------------------
   // Rare Traits
@@ -159,19 +152,19 @@ export const traits = [
   {
     name: "Casanova",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { extraBreedings: 1 }
   },
   {
     name: "Casanova II",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { extraBreedings: 2 }
   },
   {
     name: "Short Stature",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { cubBuild: "dwarf" }
   },
 
@@ -179,19 +172,19 @@ export const traits = [
   {
     name: "Favored",
     chance: 0.15,
-    activities: ["Colosseum"],
+    activities: ["colosseum"],
     perks: { returnAmount: "1-2" }
   },
   {
     name: "Battleborn",
     chance: 1.0,
-    activities: ["Colosseum"],
+    activities: ["colosseum"],
     perks: { preventInjury: true }
   },
   {
     name: "Warmonger",
     chance: 1.0,
-    activities: ["Munera"],
+    activities: ["munera"],
     perks: { reduceFailure: 0.19 }
   },
 
@@ -223,7 +216,7 @@ export const traits = [
   {
     name: "Fellowship",
     chance: 1.0,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "fellowshipList", number: 1 } }
   },
 
@@ -234,8 +227,6 @@ export const traits = [
     perks: { addSpecialItems: { table: "historianList", number: 1 } }
   },
 
-
-
   // ----------------------------
   // Epic Traits
   // ----------------------------
@@ -244,7 +235,7 @@ export const traits = [
   {
     name: "Aphrodite's Lament",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { substituteBlossom: true }
   },
 
@@ -260,25 +251,25 @@ export const traits = [
   {
     name: "Mark of the Caver",
     chance: 1.0,
-    activities: ["Caving"],
+    activities: ["caving"],
     perks: { extraItems: "1-2" }
   },
   {
     name: "Mark of the Fisher",
     chance: 1.0,
-    activities: ["Fishing"],
+    activities: ["fishing"],
     perks: { extraItems: "1-2" }
   },
   {
     name: "Mark of the Forager",
     chance: 1.0,
-    activities: ["Foraging"],
+    activities: ["foraging"],
     perks: { extraItems: "1-2" }
   },
   {
     name: "Mark of the Hunter",
     chance: 1.0,
-    activities: ["Hunting"],
+    activities: ["hunting"],
     perks: { extraItems: "1-2" }
   },
 
@@ -286,7 +277,7 @@ export const traits = [
   {
     name: "Mark of the Traveller",
     chance: 0.10,
-    activities: ["Expeditions"],
+    activities: ["expeditions"],
     perks: { duplicateRoll: true }
   },
 
@@ -305,7 +296,6 @@ export const traits = [
     activities: ["all"],
     perks: { addSpecialItems: { table: "artesianList", number: 1 } }
   },
-
 
   // ----------------------------
   // Legendary Traits
@@ -333,13 +323,13 @@ export const traits = [
   {
     name: "Breeder",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { minCubs: 3 }
   },
   {
     name: "Consul Breeding Bonus",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { extraCubChance: 0.25 }
   },
 
@@ -347,7 +337,7 @@ export const traits = [
   // Extra items
   {
     name: "Legatus Activity Bonus",
-    chance: 0.25,
+    chance: 1.0,
     activities: ["all"],
     perks: { returnAmount: "2000-2000" }
   },
@@ -362,7 +352,7 @@ export const traits = [
     {
     name: "Legatus Breeding Bonus",
     chance: 0.15,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { addSpecialItems: { table: "mutationList", number: 1 } }
   },
   {
@@ -378,56 +368,55 @@ export const traits = [
     perks: { addSpecialItems: { table: "currencyCollectorList", number: 1 } }
   },
 
-
   // ----------------------------
   // Specialty Traits: Feat Traits
   // ----------------------------
   {
     name: "Avid Quester",
     chance: 0.05,
-    activities: ["Conquests"],
+    activities: ["conquests"],
     perks: { rerollRewards: true }
   },
   {
     name: "Greedy",
     chance: 1.0,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { extraItems: 1 }
   },
   {
     name: "Legendary Angler",
     chance: 0.25,
-    activities: ["Fishing"],
+    activities: ["fishing"],
     perks: { doubleRoll: true }
   },
   {
     name: "Legendary Explorer",
     chance: 0.25,
-    activities: ["Expeditions"],
+    activities: ["expeditions"],
     perks: { doubleRoll: true }
   },
   {
     name: "Legendary Fighter",
     chance: 0.25,
-    activities: ["Colosseum"],
+    activities: ["colosseum"],
     perks: { doubleRoll: true }
   },
   {
     name: "Legendary Gatherer",
     chance: 0.25,
-    activities: ["Foraging"],
+    activities: ["foraging"],
     perks: { doubleRoll: true }
   },
   {
     name: "Legendary Trapper",
     chance: 0.25,
-    activities: ["Hunting"],
+    activities: ["hunting"],
     perks: { doubleRoll: true }
   },
   {
     name: "Self Sufficient",
     chance: 1.0,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { minItems: 2 }
   },
 
@@ -439,13 +428,13 @@ export const traits = [
   {
     name: "Indiscriminate Affections",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { allowSameGenderBreeding: true }
   },
   {
     name: "Breeder II",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { minCubs: "4-5" }
   },
 
@@ -474,19 +463,19 @@ export const traits = [
   {
     name: "Una's Gift",
     chance: 1.0,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "unasGiftList", number: 1 } }
   },
   {
     name: "Protean Blood",
     chance: 1.0,
-    activities: ["Breeding"],
+    activities: ["breeding"],
     perks: { addSpecialItems: { table: "mutationsList", number: 1 } }
   },
   {
     name: "Scholar of Alexandria",
     chance: 0.15,
-    activities: ["Fishing", "Hunting", "Caving", "Expeditions", "Foraging", "Crusades"],
+    activities: ["fishing", "hunting", "caving", "expeditions", "foraging", "crusades"],
     perks: { addSpecialItems: { table: "scholarOfAlexandriaList", number: 1 } }
   },
   {
@@ -508,7 +497,7 @@ export const traits = [
   {
     name: "Vengeful",
     chance: 1.0,
-    activities: ["Colosseum"],
+    activities: ["colosseum"],
     perks: {
     extraItems: 1 , // roll 1 item from the table
     addFixedItems: ["Medal of Honor"] // always add this on top
