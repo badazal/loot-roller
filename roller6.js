@@ -240,7 +240,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   let failureRate = 0.2; // default failure
   allEntities.forEach(e => {
     if (e.status === "on" && e.perks?.reduceFailure) {
-      failureRate -= e.perks.reduceFailure;
+      failureRate = Math.max(0, failureRate - e.perks.reduceFailure);
     }
   });
 
@@ -254,16 +254,21 @@ document.getElementById("roll-button").addEventListener("click", async () => {
 // 7. Base roll for activity items
 // ----------------------
 try {
-  const itemModule = itemModules[activity];
+// Step 1: Get a mutable copy of the item pools
+const itemModule = itemModules[activity];
   let minRoll = 2;
   let maxRoll = 5;
+const itemPools = {};
+for (const [key, arr] of Object.entries(itemModule)) {
+  itemPools[key] = [...arr]; // clone the array
+}
 
-  // Apply perks
-  ({ minRoll, maxRoll, itemPools } = applyPerksToRoll(allEntities, { 
-    minRoll, 
-    maxRoll, 
-    itemPools: itemModule // fixed
-  }));
+// Step 2: Apply perks
+({ minRoll, maxRoll, itemPools } = applyPerksToRoll(allEntities, { 
+  minRoll, 
+  maxRoll, 
+  itemPools 
+}));
 
   const baseResult = rollBaseLoot({
     minRoll,
