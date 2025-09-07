@@ -24,25 +24,27 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
         if (maxRoll !== oldMax) log.push(`${e.name} activated maxItems perk: maxRoll ${oldMax} → ${maxRoll}`);
       }
 
-      // Remove junk from all rarity pools
+      // Remove junk from all rarity pools → log only once per entity
       if (e.perks.removeJunk) {
+        let junkRemoved = false;
         for (const key in newItemPools) {
           const originalCount = newItemPools[key].length;
           newItemPools[key] = newItemPools[key].filter(i => i.type !== "junk");
-          if (originalCount !== newItemPools[key].length) {
-            log.push(`${e.name} activated and removed Junk Items from Roll`);
-          }
+          if (originalCount !== newItemPools[key].length) junkRemoved = true;
         }
+        if (junkRemoved) log.push(`${e.name} activated removeJunk perk: Junk items removed`);
       }
 
-      // Rare-only filter → keep only rare/epic/legendary
+      // Rare-only filter → keep only rare/epic/legendary → log only once per entity
       if (e.perks.rareOnly) {
+        let rareOnlyApplied = false;
         for (const key in newItemPools) {
           if (key === "rareItems" || key === "epicItems" || key === "legendaryItems") continue;
           const removedCount = newItemPools[key].length;
           newItemPools[key] = [];
-          if (removedCount) log.push(`${e.name} activated and now only Rare + iems rolled`);
+          if (removedCount) rareOnlyApplied = true;
         }
+        if (rareOnlyApplied) log.push(`${e.name} activated rareOnly perk: now only Rare+ items rolled`);
       }
     }
   });
