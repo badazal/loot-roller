@@ -12,7 +12,7 @@ import { rollBaseLoot } from "./baseRoll.js";
 // GLOBALS
 // ----------------------------
 let currentUser = null;
-const activities = ["Fishing", "Hunting", "Expeditions", "Foraging", "Caving", "Crusades", "Conquests"];
+const activities = ["fishing", "hunting", "expeditions", "foraging", "caving", "crusades", "conquests"];
 
 // ----------------------------
 // LOGIN LOGIC
