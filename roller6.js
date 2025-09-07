@@ -7,6 +7,7 @@ import { equipment } from "./data/equipment.js";
 import { traits } from "./data/traits.js";
 import { consumables } from "./data/consumables.js";
 import { rollBaseLoot } from "./baseRoll.js";
+import { applyPerksToRoll } from "./perks3.js";
 
 // Hard-coded activity → items.js imports
 import * as FishingItems from "./data/fishing/items.js";
@@ -249,26 +250,34 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     return; // stop here
   }
 
-  // ----------------------
-  // 7. Base roll for activity items
-  // ----------------------
-  try {
-    const itemModule = itemModules[activity];
-    const minRoll = 2;
-    const maxRoll = 5;
+ // ----------------------
+// 7. Base roll for activity items
+// ----------------------
+try {
+  const itemModule = itemModules[activity];
+  let minRoll = 2;
+  let maxRoll = 5;
 
-    const baseResult = rollBaseLoot({
-      minRoll,
-      maxRoll,
-      itemPools: itemModule
-    });
+  // Apply perks
+  ({ minRoll, maxRoll, itemPools } = applyPerksToRoll(allEntities, { 
+    minRoll, 
+    maxRoll, 
+    itemPools: itemModule // fixed
+  }));
 
-    rollResults.innerHTML += `<h4>Base Roll</h4>`;
-    rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-    baseResult.items.forEach(it => {
-      rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}]</p>`;
-    });
-  } catch (err) {
-    rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
-  }
+  const baseResult = rollBaseLoot({
+    minRoll,
+    maxRoll,
+    itemPools
+  });
+
+  rollResults.innerHTML += `<h4>Base Roll</h4>`;
+  rollResults.innerHTML += `<p>${baseResult.message}</p>`;
+  baseResult.items.forEach(it => {
+    rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}]</p>`;
+  });
+} catch (err) {
+  rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
+}
+
 });
