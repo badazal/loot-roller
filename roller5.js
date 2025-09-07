@@ -8,6 +8,26 @@ import { traits } from "./data/traits.js";
 import { consumables } from "./data/consumables.js";
 import { rollBaseLoot } from "./baseRoll.js";
 
+// Hard-coded activity → items.js imports
+import * as FishingItems from "./data/fishing/items.js";
+import * as HuntingItems from "./data/hunting/items.js";
+import * as ExpeditionsItems from "./data/expeditions/items.js";
+import * as ForagingItems from "./data/foraging/items.js";
+import * as CavingItems from "./data/caving/items.js";
+import * as CrusadesItems from "./data/crusades/items.js";
+import * as ConquestsItems from "./data/conquests/items.js";
+
+const itemModules = {
+  fishing: FishingItems,
+  hunting: HuntingItems,
+  expeditions: ExpeditionsItems,
+  foraging: ForagingItems,
+  caving: CavingItems,
+  crusades: CrusadesItems,
+  conquests: ConquestsItems
+};
+
+
 // ----------------------------
 // GLOBALS
 // ----------------------------
@@ -213,34 +233,35 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     rollResults.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status} ${e.note ? e.note : ""}</p>`;
   });
 
-  // ----------------------
-  // 6. Base roll for activity items
-  // ----------------------
-  try {
-    const itemModule = await import(`./data/${activity}/items.js`);
+// ----------------------
+// 6. Base roll for activity items
+// ----------------------
+try {
+  const itemModule = itemModules[activity];
 
-    // For now, hardcoded values — in the future, perks.js will modify these
-    const failureRate = 0.2; // 20% fail
-    const minRoll = 2;
-    const maxRoll = 5;
+  // For now, hardcoded values — in the future, perks.js will modify these
+  const failureRate = 0.2; // 20% fail
+  const minRoll = 2;
+  const maxRoll = 5;
 
-    const baseResult = rollBaseLoot({
-      failureRate,
-      minRoll,
-      maxRoll,
-      itemPools: itemModule
+  const baseResult = rollBaseLoot({
+    failureRate,
+    minRoll,
+    maxRoll,
+    itemPools: itemModule
+  });
+
+  rollResults.innerHTML += `<h4>Base Roll</h4>`;
+  if (!baseResult.success) {
+    rollResults.innerHTML += `<p>${baseResult.message}</p>`;
+  } else {
+    rollResults.innerHTML += `<p>${baseResult.message}</p>`;
+    baseResult.items.forEach(it => {
+      rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}]</p>`;
     });
-
-    rollResults.innerHTML += `<h4>Base Roll</h4>`;
-    if (!baseResult.success) {
-      rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-    } else {
-      rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-      baseResult.items.forEach(it => {
-        rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}]</p>`;
-      });
-    }
-  } catch (err) {
-    rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
   }
+} catch (err) {
+  rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
+}
+
 });
