@@ -30,7 +30,7 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
           const originalCount = newItemPools[key].length;
           newItemPools[key] = newItemPools[key].filter(i => i.type !== "junk");
           if (originalCount !== newItemPools[key].length) {
-            log.push(`${e.name} activated removeJunk perk: removed ${originalCount - newItemPools[key].length} items from ${key}`);
+            log.push(`${e.name} activated and removed Junk Items from Roll`);
           }
         }
       }
@@ -41,7 +41,7 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
           if (key === "rareItems" || key === "epicItems" || key === "legendaryItems") continue;
           const removedCount = newItemPools[key].length;
           newItemPools[key] = [];
-          if (removedCount) log.push(`${e.name} activated rareOnly perk: removed ${removedCount} items from ${key}`);
+          if (removedCount) log.push(`${e.name} activated and now only Rare + iems rolled`);
         }
       }
     }

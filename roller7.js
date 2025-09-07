@@ -6,7 +6,7 @@ import { companions } from "./data/companions.js";
 import { equipment } from "./data/equipment.js";
 import { traits } from "./data/traits.js";
 import { consumables } from "./data/consumables.js";
-import { rollBaseLoot } from "./baseRoll.js";
+import { rollBaseLoot } from "./baseRoll2.js";
 import { applyPerksToRoll } from "./perks4.js";
 
 // Hard-coded activity → items.js imports
@@ -271,11 +271,15 @@ minRoll = perksResult.minRoll;
 maxRoll = perksResult.maxRoll;
 const finalItemPools = perksResult.itemPools;
 
+const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
+
 const baseResult = rollBaseLoot({
   minRoll,
   maxRoll,
-  itemPools: finalItemPools
+  itemPools: finalItemPools,
+  rareOnlyActive
 });
+
 
 if (perksLog.length > 0) {
   rollResults.innerHTML += `<h4>Active Perks Affecting Base Roll</h4>`;
