@@ -254,27 +254,35 @@ document.getElementById("roll-button").addEventListener("click", async () => {
 // 7. Base roll for activity items
 // ----------------------
 try {
-// Step 1: Get a mutable copy of the item pools
-const itemModule = itemModules[activity];
   let minRoll = 2;
   let maxRoll = 5;
+// Step 1: Deep clone the item module into mutable object
+const itemModule = itemModules[activity];
 const itemPools = {};
 for (const [key, arr] of Object.entries(itemModule)) {
-  itemPools[key] = [...arr]; // clone the array
+  // Make a copy of the array for safety
+  itemPools[key] = Array.isArray(arr) ? arr.slice() : [];
 }
 
-// Step 2: Apply perks
-({ minRoll, maxRoll, itemPools } = applyPerksToRoll(allEntities, { 
+// Step 2: Pass to perks
+const perksResult = applyPerksToRoll(allEntities, { 
   minRoll, 
   maxRoll, 
   itemPools 
-}));
+});
 
-  const baseResult = rollBaseLoot({
-    minRoll,
-    maxRoll,
-    itemPools
-  });
+// Step 3: Destructure returned object
+minRoll = perksResult.minRoll;
+maxRoll = perksResult.maxRoll;
+const finalItemPools = perksResult.itemPools; // use this in base roll
+
+
+const baseResult = rollBaseLoot({
+  minRoll,
+  maxRoll,
+  itemPools: finalItemPools
+});
+
 
   rollResults.innerHTML += `<h4>Base Roll</h4>`;
   rollResults.innerHTML += `<p>${baseResult.message}</p>`;
