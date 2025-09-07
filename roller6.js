@@ -1,15 +1,13 @@
-
-// ----------------------------
-// IMPORT DATA FILES
-// ----------------------------
+// roller5.js
 import { users } from "./data/users.js";
 import { companions } from "./data/companions.js";
 import { equipment } from "./data/equipment.js";
 import { traits } from "./data/traits.js";
 import { consumables } from "./data/consumables.js";
 import { rollBaseLoot } from "./baseRoll.js";
+import { applyPerks } from "./perks2.js";
 
-// Hard-coded activity → items.js imports
+// Activity item pools
 import * as FishingItems from "./data/fishing/items.js";
 import * as HuntingItems from "./data/hunting/items.js";
 import * as ExpeditionsItems from "./data/expeditions/items.js";
@@ -28,16 +26,13 @@ const itemModules = {
   conquests: ConquestsItems
 };
 
-
-// ----------------------------
-// GLOBALS
-// ----------------------------
-let currentUser = null;
-const activities = ["fishing", "hunting", "expeditions", "foraging", "caving", "crusades", "conquests"];
+// Helper
+function rollChance(chance) { return Math.random() < chance; }
 
 // ----------------------------
 // LOGIN LOGIC
 // ----------------------------
+let currentUser = null;
 document.getElementById("login-button").addEventListener("click", () => {
   const email = document.getElementById("email").value;
   const passcode = document.getElementById("passcode").value;
@@ -56,10 +51,10 @@ document.getElementById("login-button").addEventListener("click", () => {
 // ----------------------------
 // ACTIVITY SELECTION
 // ----------------------------
+const activities = ["fishing", "hunting", "expeditions", "foraging", "caving", "crusades", "conquests"];
 function initActivitySelection() {
   const container = document.getElementById("activity-selection");
   container.innerHTML = "";
-
   activities.forEach(act => {
     const label = document.createElement("label");
     const radio = document.createElement("input");
@@ -116,7 +111,6 @@ function populateCheckboxes(containerId, items) {
     items.slice(size1, size1 + size2),
     items.slice(size1 + size2)
   ];
-  const cols = [col1, col2, col3];
 
   chunks.forEach((chunk, i) => {
     chunk.forEach(item => {
@@ -126,7 +120,7 @@ function populateCheckboxes(containerId, items) {
       checkbox.value = item.name;
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(` ${item.name} `));
-      cols[i].appendChild(label);
+      [col1, col2, col3][i].appendChild(label);
     });
   });
 
@@ -137,40 +131,17 @@ function populateCheckboxes(containerId, items) {
 }
 
 // ----------------------------
-// HELPER: roll chance
-// ----------------------------
-function rollChance(chance) {
-  return Math.random() < chance; // chance should be 0–1
-}
-// ----------------------------
 // ROLL BUTTON
 // ----------------------------
 document.getElementById("roll-button").addEventListener("click", async () => {
   const activity = document.querySelector("input[name='activity']:checked")?.value;
-  if (!activity) {
-    alert("Please select an activity first.");
-    return;
-  }
+  if (!activity) { alert("Select an activity first."); return; }
 
-  // ----------------------
-  // Collect selected entities
-  // ----------------------
-  const selectedCompanions = companions.filter(c =>
-    document.querySelector(`#companions-checkboxes input[value="${c.name}"]`)?.checked
-  );
-  const selectedEquipment = equipment.filter(e =>
-    document.querySelector(`#equipment-checkboxes input[value="${e.name}"]`)?.checked
-  );
-  const selectedTraits = traits.filter(t =>
-    document.querySelector(`#traits-checkboxes input[value="${t.name}"]`)?.checked
-  );
-  const selectedConsumables = consumables.filter(c =>
-    document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
-  );
+  const selectedCompanions = companions.filter(c => document.querySelector(`#companions-checkboxes input[value="${c.name}"]`)?.checked);
+  const selectedEquipment = equipment.filter(e => document.querySelector(`#equipment-checkboxes input[value="${e.name}"]`)?.checked);
+  const selectedTraits = traits.filter(t => document.querySelector(`#traits-checkboxes input[value="${t.name}"]`)?.checked);
+  const selectedConsumables = consumables.filter(c => document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked);
 
-  // ----------------------
-  // Build master list
-  // ----------------------
   const allEntities = [
     ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off", originalChance: c.chance, chance: c.chance })),
     ...selectedEquipment.map(e => ({ ...e, category: "equipment", status: "off", originalChance: e.chance, chance: e.chance })),
@@ -181,113 +152,118 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   const rollResults = document.getElementById("roll-results");
 
   // ----------------------
-  // Original entity rolling
+  // 1. Original entity rolling
   // ----------------------
-
-  // 1. Handle Lavinia's Luck bonus
   let companionBonus = 0;
   const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
-  if (lavinia) {
-    lavinia.status = "on";
-    companionBonus = lavinia.perks?.companionBonus || 0;
-  }
+  if (lavinia) { lavinia.status = "on"; companionBonus = lavinia.perks?.companionBonus || 0; }
 
-  // 2. Roll all entities
   allEntities.forEach(e => {
     let finalChance = e.chance || 0;
-    if (e.category === "companion" && companionBonus > 0) {
-      finalChance += companionBonus;
-      e.note = `(Lavinia's Luck applied!)`;
-    }
+    if (e.category === "companion" && companionBonus > 0) { finalChance += companionBonus; e.note = "(Lavinia's Luck applied!)"; }
     e.finalChance = finalChance;
     e.status = rollChance(finalChance) ? "on" : "off";
   });
 
-  // 3. Twist of Fate rerolls for traits
   const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
   if (twistOfFate && twistOfFate.status === "on") {
     allEntities.forEach(e => {
       if (e.category === "trait" && e.status === "off") {
         const reroll = rollChance(e.chance || 0);
         e.status = reroll ? "on" : "off";
-        e.note = e.note
-          ? `${e.note} (Twist of Fate reroll → ${e.status})`
-          : `(Twist of Fate reroll → ${e.status})`;
+        e.note = e.note ? `${e.note} (Twist of Fate reroll → ${e.status})` : `(Twist of Fate reroll → ${e.status})`;
       }
     });
   }
 
   // ----------------------
-  // FAILURE CHECK using reduceFailure perks
+  // 2. Failure check
   // ----------------------
-  let baseFailureRate = 0.2; // example base failure for activity
+  let baseFailureRate = 0.2;
   let adjustedFailureRate = baseFailureRate;
-
-  allEntities.forEach(e => {
-    if (e.status === "on" && e.perks?.reduceFailure) {
-      adjustedFailureRate -= e.perks.reduceFailure;
-    }
-  });
-
+  allEntities.forEach(e => { if (e.status === "on" && e.perks?.reduceFailure) adjustedFailureRate -= e.perks.reduceFailure; });
   const activityFailed = Math.random() < adjustedFailureRate;
   if (activityFailed) {
-    rollResults.innerHTML = `<h3>Activity Failed!</h3><p>The roll failed due to failure chance (${(adjustedFailureRate * 100).toFixed(0)}%).</p>`;
-    return; // stop everything else
+    rollResults.innerHTML = `<h3>Activity Failed!</h3><p>The roll failed due to failure chance (${(adjustedFailureRate*100).toFixed(0)}%).</p>`;
+    return;
   }
 
   // ----------------------
-  // DISPLAY entity statuses
+  // 3. Display entity statuses
   // ----------------------
   rollResults.innerHTML = `<h3>Results for ${activity}</h3>`;
   allEntities.forEach(e => {
-    const oddsDisplay = e.finalChance !== undefined
-      ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
-      : "(Odds: N/A)";
+    const oddsDisplay = e.finalChance !== undefined ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})` : "(Odds: N/A)";
     rollResults.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status} ${e.note ? e.note : ""}</p>`;
   });
 
   // ----------------------
-  // APPLY PERKS
+  // 4. Apply perks
   // ----------------------
   const perkResults = applyPerks(allEntities);
+
+  // Compute total extra items
+  let moreItems = 0;
+  const extraItemSources = [];
   perkResults.forEach(pr => {
-    rollResults.innerHTML += `<p><strong>${pr.name} Perks:</strong> ${pr.results.map(r => typeof r === "string" ? r : r.name + (r.amount ? ` x${r.amount}` : "") + (r.rarity ? ` [${r.rarity}]` : "")).join(", ")}</p>`;
+    pr.results.forEach(r => {
+      if (typeof r === "string" && r.includes("Extra items x")) {
+        const match = r.match(/Extra items x(\d+)/);
+        if (match) { moreItems += parseInt(match[1]); extraItemSources.push(pr.name); }
+      }
+    });
   });
 
   // ----------------------
-  // Base roll for activity items
+  // 5. Roll base loot
   // ----------------------
-  try {
-    const itemModule = itemModules[activity];
-    const failureRate = 0.2;
-    const minRoll = 2;
-    const maxRoll = 5;
+  const itemModule = itemModules[activity];
+  let minRoll = 2;
+  let maxRoll = 5;
 
-    // Check if any entity has duplicateBaseRoll
-    const duplicateBaseRollActive = allEntities.some(e => e.status === "on" && e.perks?.duplicateBaseRoll);
+  const minItemsEntities = allEntities.filter(e => e.status === "on" && e.perks?.minItems);
+  if (minItemsEntities.length > 0) { minRoll = Math.max(...minItemsEntities.map(e => e.perks.minItems)); }
 
-    let baseResult = rollBaseLoot({
-      failureRate,
-      minRoll,
-      maxRoll,
-      itemPools: itemModule
-    });
+  let numItems = Math.floor(Math.random() * (maxRoll - minRoll + 1)) + minRoll;
+  let baseResult = rollBaseLoot({ minRoll: numItems, maxRoll: numItems, itemPools: itemModule });
 
-    if (duplicateBaseRollActive && baseResult.success) {
+  const duplicateBaseRollActive = allEntities.some(e => e.status === "on" && e.perks?.duplicateBaseRoll);
+
+  // ----------------------
+  // 6. Output base roll
+  // ----------------------
+  rollResults.innerHTML += `<h4>Base Roll</h4>`;
+  if (!baseResult.success) {
+    rollResults.innerHTML += `<p>${baseResult.message}</p>`;
+  } else {
+    baseResult.items.forEach(it => rollResults.innerHTML += `<p>- ${it.name}${it.rarity ? ` [${it.rarity}]` : ""}${it.amount ? ` x${it.amount}` : ""}</p>`);
+
+    if (duplicateBaseRollActive) {
+      rollResults.innerHTML += `<p><em>Duplicated base roll due to perks:</em></p>`;
       baseResult.items.forEach(it => {
-        it.amount = it.amount ? it.amount * 2 : 2;
+        const amount = it.amount ? it.amount * 2 : 2;
+        rollResults.innerHTML += `<p>- ${it.name}${it.rarity ? ` [${it.rarity}]` : ""} x${amount}</p>`;
       });
     }
 
-    rollResults.innerHTML += `<h4>Base Roll</h4>`;
-    if (!baseResult.success) {
-      rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-    } else {
-      baseResult.items.forEach(it => {
-        rollResults.innerHTML += `<p>- ${it.name}${it.rarity ? ` [${it.rarity}]` : ""}${it.amount ? ` x${it.amount}` : ""}</p>`;
-      });
+    if (moreItems > 0) {
+      rollResults.innerHTML += `<h4>Additional Items (${moreItems}) from perks: ${extraItemSources.join(", ")}</h4>`;
+      const extraRoll = rollBaseLoot({ minRoll: moreItems, maxRoll: moreItems, itemPools: itemModule });
+      if (extraRoll.success) {
+        extraRoll.items.forEach(it => rollResults.innerHTML += `<p>- ${it.name}${it.rarity ? ` [${it.rarity}]` : ""}${it.amount ? ` x${it.amount}` : ""}</p>`);
+      } else {
+        rollResults.innerHTML += `<p>${extraRoll.message}</p>`;
+      }
     }
-  } catch (err) {
-    rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
   }
+
+  // ----------------------
+  // 7. Output perk mini-table results
+  // ----------------------
+  perkResults.forEach(pr => {
+    const filtered = pr.results.filter(r => typeof r === "string" && !r.includes("Extra items") && !r.includes("Duplicate base roll"));
+    if (filtered.length > 0) {
+      rollResults.innerHTML += `<p><strong>${pr.name} Perks:</strong> ${filtered.join(", ")}</p>`;
+    }
+  });
 });

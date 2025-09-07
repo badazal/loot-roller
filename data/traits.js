@@ -192,7 +192,7 @@ export const traits = [
     name: "Warmonger",
     chance: 1.0,
     activities: ["Munera"],
-    perks: { reduceFailure: 0.99 }
+    perks: { reduceFailure: 0.19 }
   },
 
   // Other Activities
@@ -202,7 +202,7 @@ export const traits = [
     name: "Clever",
     chance: 1.0,
     activities: ["all"],
-    perks: { reduceFailure: 0.99 }
+    perks: { reduceFailure: 0.19 }
   },
 
   // Add Items

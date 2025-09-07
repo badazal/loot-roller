@@ -2,12 +2,12 @@ export const equipment = [
   // ----------------------------
   // Reduce Failure Equipment
   // ----------------------------
-  { name: "Arrows", chance: 0.95, activities: ["Hunting"], perks: { reduceFailure: 0.95 } },
-  { name: "Leather Harness", chance: 0.95, activities: ["Expeditions"], perks: { reduceFailure: 0.95 } },
-  { name: "Iron Claw Tips", chance: 0.95, activities: ["Crusades"], perks: { reduceFailure: 0.95 } },
-  { name: "Torch", chance: 0.95, activities: ["Caving"], perks: { reduceFailure: 0.95 } },
-  { name: "Herbalist Gloves", chance: 0.95, activities: ["Foraging"], perks: { reduceFailure: 0.95 } },
-  { name: "Trap Netting", chance: 0.95, activities: ["Fishing"], perks: { reduceFailure: 0.95 } },
+  { name: "Arrows", chance: 0.95, activities: ["Hunting"], perks: { reduceFailure: 0.15 } },
+  { name: "Leather Harness", chance: 0.95, activities: ["Expeditions"], perks: { reduceFailure: 0.15 } },
+  { name: "Iron Claw Tips", chance: 0.95, activities: ["Crusades"], perks: { reduceFailure: 0.15 } },
+  { name: "Torch", chance: 0.95, activities: ["Caving"], perks: { reduceFailure: 0.15 } },
+  { name: "Herbalist Gloves", chance: 0.95, activities: ["Foraging"], perks: { reduceFailure: 0.15 } },
+  { name: "Trap Netting", chance: 0.95, activities: ["Fishing"], perks: { reduceFailure: 0.15 } },
 
   // ----------------------------
   // Extra Items Equipment
