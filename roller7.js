@@ -281,18 +281,24 @@ const baseResult = rollBaseLoot({
 });
 
 
+// ----------------------
+// Display perks in middle column
+const perkLogDiv = document.getElementById("perk-log");
+perkLogDiv.innerHTML = ""; // clear previous
 if (perksLog.length > 0) {
-  rollResults.innerHTML += `<h4>Active Perks Affecting Base Roll</h4>`;
   perksLog.forEach(note => {
-    rollResults.innerHTML += `<p>${note}</p>`;
+    perkLogDiv.innerHTML += `<p>${note}</p>`;
   });
 }
 
-  rollResults.innerHTML += `<h4>Base Roll</h4>`;
-  rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-    baseResult.items.forEach(it => {
-    rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}, ${it.type}]</p>`;
-    });
+// ----------------------
+// Display base roll items in right column
+const itemsDiv = document.getElementById("roll-results");
+itemsDiv.innerHTML = `<p>${baseResult.message}</p>`;
+baseResult.items.forEach(it => {
+  itemsDiv.innerHTML += `<p>- ${it.name} [${it.rarity}, ${it.type}]</p>`;
+});
+
 
 } catch (err) {
   rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
