@@ -67,7 +67,7 @@ input[type="email"], input[type="password"] {
 
 /* Left Column: selections + roll button */
 #selection-column {
-  flex: 1;                  /* adjustable */
+  flex: 2;                  /* adjustable */
   padding: 10px;
   background-color: #fff;
   border-radius: 8px;
@@ -89,7 +89,7 @@ input[type="email"], input[type="password"] {
 
 /* Right Column: base roll items */
 #items-column {
-  flex: 1.5;                /* wider column for item list */
+  flex: 1;                /* wider column for item list */
   padding: 10px;
   background-color: #e7f3fe;
   border-radius: 8px;
