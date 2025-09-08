@@ -169,9 +169,6 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
   );
 
-  // Initialize perks log AFTER selections
-  const perksLog = [];
-
   // ----------------------
   // 2. Build master list
   // ----------------------
@@ -224,12 +221,29 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   }
 
   // ----------------------
-  // 6. Display perks & entity status in middle column
+  // 6. Prepare item pools & apply perks
+  // ----------------------
+  const perksLog = [];
+  let minRoll = 2;
+  let maxRoll = 5;
+  const itemModule = itemModules[activity];
+  const itemPools = {};
+  for (const [key, arr] of Object.entries(itemModule)) {
+    itemPools[key] = Array.isArray(arr) ? arr.slice() : [];
+  }
+
+  const perksResult = applyPerksToRoll(allEntities, { minRoll, maxRoll, itemPools }, perksLog);
+  minRoll = perksResult.minRoll;
+  maxRoll = perksResult.maxRoll;
+  const finalItemPools = perksResult.itemPools;
+
+  // ----------------------
+  // 7. Display perks & entity status in middle column
   // ----------------------
   const perkLogDiv = document.getElementById("perk-log");
   perkLogDiv.innerHTML = `<h3>Results for ${activity}</h3>`;
 
-  // Only show actual perk activation messages from perksLog
+  // Active Perks only from perksLog
   perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
   if (perksLog.length > 0) {
     perksLog.forEach(note => {
@@ -249,7 +263,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   });
 
   // ----------------------
-  // 7. Failure check before base roll
+  // 8. Failure check before base roll
   // ----------------------
   let failureRate = 0.2; // default failure
   allEntities.forEach(e => {
@@ -265,25 +279,10 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   }
 
   // ----------------------
-  // 8. Base roll for activity items
+  // 9. Base roll for activity items
   // ----------------------
   try {
-    let minRoll = 2;
-    let maxRoll = 5;
-    const itemModule = itemModules[activity];
-    const itemPools = {};
-    for (const [key, arr] of Object.entries(itemModule)) {
-      itemPools[key] = Array.isArray(arr) ? arr.slice() : [];
-    }
-
-    const perksResult = applyPerksToRoll(allEntities, { minRoll, maxRoll, itemPools }, perksLog);
-
-    minRoll = perksResult.minRoll;
-    maxRoll = perksResult.maxRoll;
-    const finalItemPools = perksResult.itemPools;
-
     const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
-
     const baseResult = rollBaseLoot({ minRoll, maxRoll, itemPools: finalItemPools, rareOnlyActive });
 
     // Display base roll items in right column
