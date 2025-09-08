@@ -140,7 +140,7 @@ function populateCheckboxes(containerId, items) {
 // HELPER: roll chance
 // ----------------------------
 function rollChance(chance) {
-  return Math.random() < chance; // chance should be 0–1
+  return Math.random() < chance;
 }
 
 // ----------------------------
@@ -238,22 +238,21 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   const finalItemPools = perksResult.itemPools;
 
   // ----------------------
-  // 7. Display perks & entity status in middle column
+  // 7. Display middle column (original perks + entity status)
   // ----------------------
   const perkLogDiv = document.getElementById("perk-log");
   perkLogDiv.innerHTML = `<h3>Results for ${activity}</h3>`;
-
-  // Active Perks only from perksLog
   perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
-  if (perksLog.length > 0) {
-    perksLog.forEach(note => {
-      perkLogDiv.innerHTML += `<p>${note}</p>`;
+  const activePerks = allEntities.filter(e => e.status === "on" && e.perks);
+  if (activePerks.length > 0) {
+    activePerks.forEach(e => {
+      for (const perkName in e.perks) {
+        perkLogDiv.innerHTML += `<p>${e.name} → ${perkName}</p>`;
+      }
     });
   } else {
     perkLogDiv.innerHTML += `<p>None</p>`;
   }
-
-  // Add spacing before entity status
   perkLogDiv.innerHTML += `<br><h4>Entity Status</h4>`;
   allEntities.forEach(e => {
     const oddsDisplay = e.finalChance !== undefined
@@ -279,15 +278,24 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   }
 
   // ----------------------
-  // 9. Base roll for activity items
+  // 9. Right column: fancy perk messages + base roll
   // ----------------------
   try {
+    const itemsDiv = document.getElementById("roll-results");
+    itemsDiv.innerHTML = ""; // clear previous
+
+    if (perksLog.length > 0) {
+      itemsDiv.innerHTML += `<h4>Perk Messages</h4>`;
+      perksLog.forEach(note => {
+        itemsDiv.innerHTML += `<p>${note}</p>`;
+      });
+      itemsDiv.innerHTML += `<br>`;
+    }
+
     const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
     const baseResult = rollBaseLoot({ minRoll, maxRoll, itemPools: finalItemPools, rareOnlyActive });
 
-    // Display base roll items in right column
-    const itemsDiv = document.getElementById("roll-results");
-    itemsDiv.innerHTML = `<h4>Base Roll</h4><p>${baseResult.message}</p>`;
+    itemsDiv.innerHTML += `<h4>Base Roll</h4><p>${baseResult.message}</p>`;
     baseResult.items.forEach(it => {
       itemsDiv.innerHTML += `<p>- ${it.name} [${it.rarity}, ${it.type}]</p>`;
     });
