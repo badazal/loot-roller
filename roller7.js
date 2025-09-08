@@ -290,9 +290,10 @@ if (perksLog.length > 0) {
 
   rollResults.innerHTML += `<h4>Base Roll</h4>`;
   rollResults.innerHTML += `<p>${baseResult.message}</p>`;
-  baseResult.items.forEach(it => {
-    rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}]</p>`;
-  });
+    baseResult.items.forEach(it => {
+    rollResults.innerHTML += `<p>- ${it.name} [${it.rarity}, ${it.type}]</p>`;
+    });
+
 } catch (err) {
   rollResults.innerHTML += `<p style="color:red;">Error loading items for ${activity}: ${err.message}</p>`;
 }

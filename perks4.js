@@ -14,14 +14,14 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
       if (e.perks.minItems !== undefined) {
         const oldMin = minRoll;
         minRoll = Math.max(minRoll, e.perks.minItems);
-        if (minRoll !== oldMin) log.push(`${e.name} activated minItems perk: minRoll ${oldMin} → ${minRoll}`);
+        if (minRoll !== oldMin) log.push(`${e.name} activated: minimum roll increased ${oldMin} → ${minRoll}`);
       }
 
       // Override maximum roll
       if (e.perks.maxItems !== undefined) {
         const oldMax = maxRoll;
         maxRoll = Math.max(maxRoll, e.perks.maxItems);
-        if (maxRoll !== oldMax) log.push(`${e.name} activated maxItems perk: maxRoll ${oldMax} → ${maxRoll}`);
+        if (maxRoll !== oldMax) log.push(`${e.name} activated: maximum roll increased ${oldMax} → ${maxRoll}`);
       }
 
       // Remove junk from all rarity pools → log only once per entity
@@ -32,7 +32,7 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
           newItemPools[key] = newItemPools[key].filter(i => i.type !== "junk");
           if (originalCount !== newItemPools[key].length) junkRemoved = true;
         }
-        if (junkRemoved) log.push(`${e.name} activated removeJunk perk: Junk items removed`);
+        if (junkRemoved) log.push(`${e.name} activated: Junk items removed`);
       }
 
       // Rare-only filter → keep only rare/epic/legendary → log only once per entity
@@ -44,7 +44,7 @@ export function applyPerksToRoll(allEntities, rollParams, log = []) {
           newItemPools[key] = [];
           if (removedCount) rareOnlyApplied = true;
         }
-        if (rareOnlyApplied) log.push(`${e.name} activated rareOnly perk: now only Rare+ items rolled`);
+        if (rareOnlyApplied) log.push(`${e.name} activated: Only Rare+ items rolled`);
       }
     }
   });
