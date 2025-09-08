@@ -229,12 +229,23 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   const perkLogDiv = document.getElementById("perk-log");
   perkLogDiv.innerHTML = `<h3>Results for ${activity}</h3>`;
 
-  // Active perks
+  // Only show actual perk activation messages from perksLog
   perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
-  const activePerks = allEntities.filter(e => e.status === "on" && e.perks);
-  activePerks.forEach(e => {
-    const perkNames = Object.keys(e.perks).join(", ");
-    perkLogDiv.innerHTML += `<p>${e.name} → ${perkNames}</p>`;
+  if (perksLog.length > 0) {
+    perksLog.forEach(note => {
+      perkLogDiv.innerHTML += `<p>${note}</p>`;
+    });
+  } else {
+    perkLogDiv.innerHTML += `<p>None</p>`;
+  }
+
+  // Add spacing before entity status
+  perkLogDiv.innerHTML += `<br><h4>Entity Status</h4>`;
+  allEntities.forEach(e => {
+    const oddsDisplay = e.finalChance !== undefined
+      ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
+      : "(Odds: N/A)";
+    perkLogDiv.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status}${e.note ? ` ${e.note}` : ""}</p>`;
   });
 
   // ----------------------
@@ -271,25 +282,9 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     maxRoll = perksResult.maxRoll;
     const finalItemPools = perksResult.itemPools;
 
-    // Add perksLog messages under Active Perks
-    if (perksLog.length > 0) {
-      perksLog.forEach(note => {
-        perkLogDiv.innerHTML += `<p>${note}</p>`;
-      });
-    }
-
     const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
 
     const baseResult = rollBaseLoot({ minRoll, maxRoll, itemPools: finalItemPools, rareOnlyActive });
-
-    // Entity status
-    perkLogDiv.innerHTML += `<h4>Entity Status</h4>`;
-    allEntities.forEach(e => {
-      const oddsDisplay = e.finalChance !== undefined
-        ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
-        : "(Odds: N/A)";
-      perkLogDiv.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status}${e.note ? ` ${e.note}` : ""}</p>`;
-    });
 
     // Display base roll items in right column
     const itemsDiv = document.getElementById("roll-results");
