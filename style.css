@@ -33,7 +33,7 @@ label {
 }
 
 input[type="email"], input[type="password"] {
-  width: 100%;
+  width: 50%;
   padding: 8px;
   margin: 8px 0;
   box-sizing: border-box;
@@ -67,7 +67,7 @@ input[type="email"], input[type="password"] {
 
 /* Left Column: selections + roll button */
 #selection-column {
-  flex: 2;                  /* adjustable */
+  flex: 1.5;                  /* adjustable */
   padding: 10px;
   background-color: #fff;
   border-radius: 8px;
@@ -78,7 +78,7 @@ input[type="email"], input[type="password"] {
 
 /* Middle Column: perk log */
 #perk-column {
-  flex: 1;                  /* adjustable */
+  flex: 1.5;                  /* adjustable */
   padding: 10px;
   background-color: #fff;
   border-radius: 8px;
