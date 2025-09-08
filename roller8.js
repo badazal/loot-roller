@@ -115,7 +115,6 @@ function populateCheckboxes(containerId, items) {
     items.slice(size1, size1 + size2),
     items.slice(size1 + size2)
   ];
-  const cols = [col1, col2, col3];
 
   chunks.forEach((chunk, i) => {
     chunk.forEach(item => {
@@ -227,24 +226,17 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   const perkLogDiv = document.getElementById("perk-log");
   perkLogDiv.innerHTML = `<h3>Results for ${activity}</h3>`;
 
-  // Active perks
+  // Active perks + perk log messages
+  perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
   const activePerks = allEntities.filter(e => e.status === "on" && e.perks);
-  if (activePerks.length > 0) {
-    perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
-    activePerks.forEach(e => {
-      const perkNames = Object.keys(e.perks).join(", ");
-      perkLogDiv.innerHTML += `<p>${e.name} → ${perkNames}</p>`;
-    });
-  }
-
-  // Entity status
-  perkLogDiv.innerHTML += `<h4>Entity Status</h4>`;
-  allEntities.forEach(e => {
-    const oddsDisplay = e.finalChance !== undefined
-      ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
-      : "(Odds: N/A)";
-    perkLogDiv.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status}${e.note ? ` ${e.note}` : ""}</p>`;
+  activePerks.forEach(e => {
+    const perkNames = Object.keys(e.perks).join(", ");
+    perkLogDiv.innerHTML += `<p>${e.name} → ${perkNames}</p>`;
   });
+
+  // Append perksLog messages under Active Perks
+  const perksLog = []; // will be filled below by applyPerksToRoll
+  
 
   // ----------------------
   // 6. Failure check before base roll
@@ -259,7 +251,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   if (Math.random() < failureRate) {
     const itemsDiv = document.getElementById("roll-results");
     itemsDiv.innerHTML = `<h4>Base Roll</h4><p>The roll has failed. No items gained.</p>`;
-    return; // stop here
+    return;
   }
 
   // ----------------------
@@ -268,19 +260,25 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   try {
     let minRoll = 2;
     let maxRoll = 5;
-    // Step 1: Deep clone the item module into mutable object
     const itemModule = itemModules[activity];
     const itemPools = {};
     for (const [key, arr] of Object.entries(itemModule)) {
       itemPools[key] = Array.isArray(arr) ? arr.slice() : [];
     }
 
-    const perksLog = [];
+    // Apply perks to roll and populate perksLog
     const perksResult = applyPerksToRoll(allEntities, { minRoll, maxRoll, itemPools }, perksLog);
 
     minRoll = perksResult.minRoll;
     maxRoll = perksResult.maxRoll;
     const finalItemPools = perksResult.itemPools;
+
+    // Append any perk messages from applyPerksToRoll under Active Perks
+    if (perksLog.length > 0) {
+      perksLog.forEach(note => {
+        perkLogDiv.innerHTML += `<p>${note}</p>`;
+      });
+    }
 
     const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
 
@@ -292,12 +290,14 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     });
 
     // ----------------------
-    // Display perks log in middle column
-    if (perksLog.length > 0) {
-      perksLog.forEach(note => {
-        perkLogDiv.innerHTML += `<p>${note}</p>`;
-      });
-    }
+    // Entity status
+    perkLogDiv.innerHTML += `<h4>Entity Status</h4>`;
+    allEntities.forEach(e => {
+      const oddsDisplay = e.finalChance !== undefined
+        ? `(Odds: ${e.originalChance.toFixed(2)}${e.finalChance !== e.originalChance ? ` → ${e.finalChance.toFixed(2)}` : ""})`
+        : "(Odds: N/A)";
+      perkLogDiv.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status}${e.note ? ` ${e.note}` : ""}</p>`;
+    });
 
     // ----------------------
     // Display base roll items in right column
