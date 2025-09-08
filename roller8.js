@@ -116,6 +116,8 @@ function populateCheckboxes(containerId, items) {
     items.slice(size1 + size2)
   ];
 
+  const cols = [col1, col2, col3];
+
   chunks.forEach((chunk, i) => {
     chunk.forEach(item => {
       const label = document.createElement("label");
@@ -151,7 +153,9 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     return;
   }
 
-  // Collect selected checkboxes
+  // ----------------------
+  // 1. Collect selected checkboxes
+  // ----------------------
   const selectedCompanions = companions.filter(c =>
     document.querySelector(`#companions-checkboxes input[value="${c.name}"]`)?.checked
   );
@@ -165,8 +169,11 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     document.querySelector(`#consumables-checkboxes input[value="${c.name}"]`)?.checked
   );
 
+  // Initialize perks log AFTER selections
+  const perksLog = [];
+
   // ----------------------
-  // 1. Build master list
+  // 2. Build master list
   // ----------------------
   const allEntities = [
     ...selectedCompanions.map(c => ({ ...c, category: "companion", status: "off", originalChance: c.chance, chance: c.chance })),
@@ -176,7 +183,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   ];
 
   // ----------------------
-  // 2. Handle Lavinia's Luck
+  // 3. Handle Lavinia's Luck
   // ----------------------
   let companionBonus = 0;
   const lavinia = allEntities.find(e => e.name === "Lavinia's Luck");
@@ -186,7 +193,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   }
 
   // ----------------------
-  // 3. Roll everything else
+  // 4. Roll everything else
   // ----------------------
   allEntities.forEach(e => {
     let finalChance = e.chance || 0;
@@ -199,7 +206,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   });
 
   // ----------------------
-  // 4. Twist of Fate rerolls
+  // 5. Twist of Fate rerolls
   // ----------------------
   const twistOfFate = allEntities.find(e => e.name === "Twist of Fate");
   if (twistOfFate && twistOfFate.status === "on") {
@@ -208,25 +215,21 @@ document.getElementById("roll-button").addEventListener("click", async () => {
         const reroll = rollChance(e.chance || 0);
         if (reroll) {
           e.status = "on";
-          e.note = e.note
-            ? `${e.note} (Twist of Fate reroll → On)`
-            : "(Twist of Fate reroll → On)";
+          e.note = e.note ? `${e.note} (Twist of Fate reroll → On)` : "(Twist of Fate reroll → On)";
         } else {
-          e.note = e.note
-            ? `${e.note} (Twist of Fate reroll → still Off)`
-            : "(Twist of Fate reroll → still Off)";
+          e.note = e.note ? `${e.note} (Twist of Fate reroll → still Off)` : "(Twist of Fate reroll → still Off)";
         }
       }
     });
   }
 
   // ----------------------
-  // 5. Display entity results + perks in middle column
+  // 6. Display perks & entity status in middle column
   // ----------------------
   const perkLogDiv = document.getElementById("perk-log");
   perkLogDiv.innerHTML = `<h3>Results for ${activity}</h3>`;
 
-  // Active perks + perk log messages
+  // Active perks
   perkLogDiv.innerHTML += `<h4>Active Perks</h4>`;
   const activePerks = allEntities.filter(e => e.status === "on" && e.perks);
   activePerks.forEach(e => {
@@ -234,12 +237,8 @@ document.getElementById("roll-button").addEventListener("click", async () => {
     perkLogDiv.innerHTML += `<p>${e.name} → ${perkNames}</p>`;
   });
 
-  // Append perksLog messages under Active Perks
-  const perksLog = []; // will be filled below by applyPerksToRoll
-  
-
   // ----------------------
-  // 6. Failure check before base roll
+  // 7. Failure check before base roll
   // ----------------------
   let failureRate = 0.2; // default failure
   allEntities.forEach(e => {
@@ -255,7 +254,7 @@ document.getElementById("roll-button").addEventListener("click", async () => {
   }
 
   // ----------------------
-  // 7. Base roll for activity items
+  // 8. Base roll for activity items
   // ----------------------
   try {
     let minRoll = 2;
@@ -266,14 +265,13 @@ document.getElementById("roll-button").addEventListener("click", async () => {
       itemPools[key] = Array.isArray(arr) ? arr.slice() : [];
     }
 
-    // Apply perks to roll and populate perksLog
     const perksResult = applyPerksToRoll(allEntities, { minRoll, maxRoll, itemPools }, perksLog);
 
     minRoll = perksResult.minRoll;
     maxRoll = perksResult.maxRoll;
     const finalItemPools = perksResult.itemPools;
 
-    // Append any perk messages from applyPerksToRoll under Active Perks
+    // Add perksLog messages under Active Perks
     if (perksLog.length > 0) {
       perksLog.forEach(note => {
         perkLogDiv.innerHTML += `<p>${note}</p>`;
@@ -282,14 +280,8 @@ document.getElementById("roll-button").addEventListener("click", async () => {
 
     const rareOnlyActive = allEntities.some(e => e.status === "on" && e.perks?.rareOnly);
 
-    const baseResult = rollBaseLoot({
-      minRoll,
-      maxRoll,
-      itemPools: finalItemPools,
-      rareOnlyActive
-    });
+    const baseResult = rollBaseLoot({ minRoll, maxRoll, itemPools: finalItemPools, rareOnlyActive });
 
-    // ----------------------
     // Entity status
     perkLogDiv.innerHTML += `<h4>Entity Status</h4>`;
     allEntities.forEach(e => {
@@ -299,7 +291,6 @@ document.getElementById("roll-button").addEventListener("click", async () => {
       perkLogDiv.innerHTML += `<p>${e.name} ${oddsDisplay}: ${e.status}${e.note ? ` ${e.note}` : ""}</p>`;
     });
 
-    // ----------------------
     // Display base roll items in right column
     const itemsDiv = document.getElementById("roll-results");
     itemsDiv.innerHTML = `<h4>Base Roll</h4><p>${baseResult.message}</p>`;
